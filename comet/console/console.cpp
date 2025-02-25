@@ -137,11 +137,8 @@ namespace console {
         // Objects iters
         auto objects = t->getObjFiles();
         auto sources = t->getSources();
-        
         while(objects.size() > 0) {
             std::cout << objects.back() << ' ' << sources.back() << std::endl;
-
-            
 
             objects.pop_back();
             sources.pop_back();

@@ -9,6 +9,8 @@ struct Configs;
 
 struct CompilerOptions {
 
+    const std::string &compiler;
+
     const std::string &flags;
 
     const std::string &root;

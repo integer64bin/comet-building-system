@@ -42,5 +42,7 @@ public:
 
 };
 
+std::string_view asString(comet::TokenType type);
+
 
 }

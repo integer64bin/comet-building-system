@@ -10,6 +10,9 @@
 #include <ast\statement\FunctionStatement.hpp>
 #include <ast\statement\AssignmentStatement.hpp>
 
+#include <exception\parser\UnknownExpression.hpp>
+#include <exception\parser\UnexpectedToken.hpp>
+
 #include <util.hpp>
 
 namespace comet {
@@ -68,9 +71,7 @@ bool Parser::look(TokenType type, std::size_t relativePos) {
 void Parser::consume(TokenType type) {
     if(match(type)) return;
     else {
-        std::cerr << "Token typed expected " << asString(type)
-        << ", but token type is " << asString(type) << std::endl;
-        exit(1);
+        throw UnexpectedTokenException(type, get(0).getType());
     }
 }
 
@@ -130,9 +131,7 @@ Expression *Parser::primary() {
     } else if(look(TokenType::WORD)) {
         result = new AccessExpression( next().getText() );
     } else {
-        std::cout << get() << std::endl;
-        std::cerr << "Unknown expression";
-        exit(1);
+        throw UnknownExprssionException("Unknown expression: ");
     }
     return result;
 }

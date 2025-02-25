@@ -8,6 +8,8 @@
 
 #include <Script.hpp>
 
+#include <exception\console\CommandError.hpp>
+
 namespace comet {
 
 namespace console {
@@ -29,8 +31,7 @@ namespace console {
     
     void parseArguments(int argc, const char **argv) {
 
-        if(argc == 0) {
-            std::cout << "" << std::endl;
+        if(argc == 1) {
             return;
         }
 
@@ -91,9 +92,7 @@ namespace console {
     void build(std::string name) {
         if(name.empty()) {
             if(!Projects::projects.empty() && Projects::projects.size() > 1) {
-                std::cerr << "Enter target name" << std::endl;
-                std::cerr << "Script is interrupted" << std::endl;
-                exit(1);
+                throw CommandError();
             }
 
             name = Projects::target->getName();
@@ -129,6 +128,7 @@ namespace console {
         
 
         CompilerOptions opts {
+            t->getCompiler(),
             Compiler::getFlags({stdFlag, "-pipe"}),
             t->getRoot(),
             t->getIncludeDirectories(),

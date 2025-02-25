@@ -1,5 +1,4 @@
 #include <token\Token.hpp>
-#include <util.hpp>
 
 namespace comet {
 
@@ -24,17 +23,17 @@ std::ostream &operator <<(std::ostream &os, const Token &t) {
 
 std::string_view asString(comet::TokenType type) {
     switch(type) {
-        case comet::TokenType::COMMA:  return std::string_view("cmm");
-        case comet::TokenType::TEXT:   return std::string_view("txt");
-        case comet::TokenType::WORD:   return std::string_view("wrd");
-        case comet::TokenType::NUMBER: return std::string_view("num");
-        case comet::TokenType::LPAREN: return std::string_view("lpr");
-        case comet::TokenType::RPAREN: return std::string_view("rpr");
-        case comet::TokenType::COLON:  return std::string_view("cln");
-        case comet::TokenType::DOLLAR: return std::string_view("dlr");
-        case comet::TokenType::EQ:     return std::string_view("eql");
+        case comet::TokenType::COMMA:  return std::string_view("comma");
+        case comet::TokenType::TEXT:   return std::string_view("text");
+        case comet::TokenType::WORD:   return std::string_view("word");
+        case comet::TokenType::NUMBER: return std::string_view("number");
+        case comet::TokenType::LPAREN: return std::string_view("left_parenthesis");
+        case comet::TokenType::RPAREN: return std::string_view("right_parenthesis");
+        case comet::TokenType::COLON:  return std::string_view("colon");
+        case comet::TokenType::DOLLAR: return std::string_view("dollar");
+        case comet::TokenType::EQ:     return std::string_view("equals");
         default:
-            return std::string_view("unk");
+            return std::string_view("unknown");
     }
 }
 

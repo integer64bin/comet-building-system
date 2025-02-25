@@ -93,7 +93,7 @@ public:
 
     void addIncludeDirectories(std::list<std::string> dirs);
 
-    std::list<std::string> &getIncludeDirectories();
+    std::list<std::string> getIncludeDirectories();
 
     bool hasIncludes();
 
@@ -105,6 +105,8 @@ public:
     void addDL(std::string name);
 
     std::list<std::string> getDLs();
+
+    std::list<std::string> getLibarySearchingPaths();
 
     // Satic
     void addSL(std::string fullname);

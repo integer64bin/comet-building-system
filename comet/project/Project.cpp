@@ -46,7 +46,7 @@ void Project::addIncludeDirectories(std::list<std::string> dirs) {
     );
 }
 
-std::list<std::string> &Project::getIncludeDirectories() {
+std::list<std::string> Project::getIncludeDirectories() {
     return m_configurations.includeDirectories;
 }
 

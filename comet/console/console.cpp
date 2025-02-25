@@ -115,30 +115,32 @@ namespace console {
         std::string out = t->getObjectPath() + "\\";
         initObjDirectories(t, out);
         
-        std::string options;
-
-        // Creates -I flag for include directories
-        if(t->hasIncludes()) {
-            std::list<std::string> includes = t->getIncludeDirectories();
-
-            std::string inclFlag = std::move(getIncludeFlags(t));
-
-            options.append(inclFlag);
-        }
+        // std::string options;
 
         // Specifies c++ standart
         std::string stdFlag = getStandartFlag(t);
 
-        options.append(stdFlag);
-        options.push_back(' ');
+        // options.append(stdFlag);
+        // options.push_back(' ');
 
 
         // Starting compilation
         // Objects iters
+        
+
+        CompilerOptions opts {
+            Compiler::getFlags({stdFlag, "-pipe"}),
+            t->getRoot(),
+            t->getIncludeDirectories(),
+            t->getIncludeDirectories()
+        };
+
         auto objects = t->getObjFiles();
         auto sources = t->getSources();
+        
         while(objects.size() > 0) {
-            std::cout << objects.back() << ' ' << sources.back() << std::endl;
+            
+            Compiler::compile(opts, objects.back(), sources.back());
 
             objects.pop_back();
             sources.pop_back();

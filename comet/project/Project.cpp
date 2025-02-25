@@ -71,8 +71,8 @@ void Project::addSL(std::string fullname) {
     m_configurations.sls.push_back(fullname);
 }
 
-std::string &Project::getSLs() {
-    m_configurations.sls;
+std::list<std::string> &Project::getSLs() {
+    return m_configurations.sls;
 }
 
 std::string Project::getName() {

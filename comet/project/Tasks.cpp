@@ -59,7 +59,6 @@ void addSource(std::vector< std::string > files) {
 }
 
 void addSource(std::string file) {
-    std::cout << file << std::endl;
     Projects::target->addSource(file);
 }
 

@@ -111,7 +111,7 @@ public:
     // Satic
     void addSL(std::string fullname);
 
-    std::string &getSLs();
+    std::list<std::string> &getSLs();
 
                       /*--------------Variables-------------*/
 

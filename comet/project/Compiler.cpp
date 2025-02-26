@@ -38,7 +38,7 @@ void Compiler::compile(CompilerOptions &opts, std::string src, std::string out) 
 
 // Linking
 // -o
-void Compiler::link(CompilerOptions &opts, std::list<std::string> files) {
+void Compiler::link(CompilerOptions &opts, std::list<std::string> files, bool sources) {
     
 }
 

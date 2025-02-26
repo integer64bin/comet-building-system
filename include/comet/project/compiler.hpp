@@ -41,9 +41,17 @@ public:
     static void compile(CompilerOptions &opts, std::string src, std::string out = "");
 
     // Linking
-    // -o
-    static void link(CompilerOptions &opts, std::list<std::string> files);
+    // -o 
+    // If fromSource flag setted to true, adds include flag and libraies 
+    static void link(
+        CompilerOptions &opts, 
+        std::list<std::string> files, 
+        bool sources = false
+    );
 
+
+    // Support
+    // Creates string 
     static std::string getFlags(std::list<std::string> flags);
 
     static std::string getFlags(std::initializer_list<std::string> flags);

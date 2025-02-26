@@ -50,7 +50,6 @@ namespace console {
         if(command.compare("setup") == 0) {
             fs::path dir;
             if(argc == 0 || (argc == 1 && args[0].compare("."))) {
-                // std::ofstream xconfigFile(".");
                 dir = fs::path(workspace);
             } else {
                 dir = fs::path(workspace + "\\" + args[0]);
@@ -58,12 +57,22 @@ namespace console {
 
             setup(dir);
 
-        } else if(command.compare("build") == 0) {
+         
+        } else if(command.compare("help") == 0) {
+
+        } else { // commands that require script
             readScript();
-            if(argc == 0) {
-                build("");             
-            } else
-                build(args[0]);
+            
+            if(command.compare("build") == 0) {
+                if(argc == 0) {
+                    build("");             
+                } else
+                    build(args[0]);
+            } else if(command.compare("link") == 0) {
+
+            } else if(command.compare("info") == 0) {
+
+            }
         }
     }
 
@@ -83,8 +92,15 @@ namespace console {
     
     void setup(fs::path where) {
         where.append("\\.xconfig");
+        // If file exists do nothing
+        if(fs::exists(where))
+            return;
+        // Else
+        // Opening the file in append mode
+        // and adding commet
         std::ofstream xconfigFile(where, std::ios_base::app);
         xconfigFile << "# Write your script here..." << std::endl;
+        
         xconfigFile.close();
     }
 
@@ -109,23 +125,19 @@ namespace console {
         }
     }
 
+
+    // First compiles all file
+    // After links them together
     void _buildWithObjFiles(Project *t) {
 
         std::string out = t->getObjectPath() + "\\";
+        // Creates output directories, if they doesn't exist
+        // Also adds object files to Project::m_configurations.objFiles
         initObjDirectories(t, out);
         
-        // std::string options;
-
         // Specifies c++ standart
         std::string stdFlag = getStandartFlag(t);
 
-        // options.append(stdFlag);
-        // options.push_back(' ');
-
-
-        // Starting compilation
-        // Objects iters
-        
 
         CompilerOptions opts {
             t->getCompiler(),

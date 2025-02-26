@@ -1,6 +1,8 @@
+#include <util.hpp>
+
 #include <fstream>
 
-#include <util.hpp>
+#include <vector>
 
 namespace comet {
 
@@ -9,6 +11,16 @@ std::string *makeStringArray(int argc, const char **argv) {
         return nullptr;
     }
     std::string *strings = new std::string[argc];
+
+    for(int i = 0; i < argc; i++) {
+        strings[i] = argv[i];
+    }
+
+    return strings;
+}
+
+std::vector<std::string> makeStringVector(int argc, const char **argv) {
+    std::vector<std::string> strings(argc);
 
     for(int i = 0; i < argc; i++) {
         strings[i] = argv[i];

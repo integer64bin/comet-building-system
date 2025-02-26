@@ -16,9 +16,18 @@ namespace console {
 
     namespace fs = std::filesystem;
 
+    // Place from which called comet.exe
+    //
     std::string workspace;
 
+    //  
     std::string root = ".";
+
+    // List of arguments
+    std::vector<std::string> arguments;
+
+    // Current project
+    Project *current;
 
     std::string getWorkingDirectory(std::string &line) {
         auto i = line.size() - 1;
@@ -35,24 +44,27 @@ namespace console {
             return;
         }
 
-        std::string *args = makeStringArray(argc, argv);
+        arguments = makeStringVector(argc, argv);
 
         // after last '\' comes exe-file name
         // befor last '\' comes working directory
-        workspace = getWorkingDirectory(args[0]);
+        workspace = getWorkingDirectory(arguments[0]);
 
-        parseCommand(args[1], &args[2], argc-2);
-
-        delete[] args;
+        parseCommand();
     }
 
-    void parseCommand(std::string command, std::string *args, int argc) {
+    void parseCommand() {
+        // Count of arguments without command and work directory
+        int argc = arguments.size() - 2;
+
+        std::string command = arguments[1];
+
         if(command.compare("setup") == 0) {
             fs::path dir;
-            if(argc == 0 || (argc == 1 && args[0].compare("."))) {
+            if(argc == 0 || (argc == 1 && arguments[2].compare("."))) {
                 dir = fs::path(workspace);
             } else {
-                dir = fs::path(workspace + "\\" + args[0]);
+                dir = fs::path(workspace + "\\" + arguments[2]);
             }
 
             setup(dir);
@@ -67,7 +79,7 @@ namespace console {
                 if(argc == 0) {
                     build("");             
                 } else
-                    build(args[0]);
+                    build(arguments[2]);
             } else if(command.compare("link") == 0) {
 
             } else if(command.compare("info") == 0) {
@@ -118,17 +130,42 @@ namespace console {
 
 
             if(Projects::target->hasObjectsPath())
-                _buildWithObjFiles(Projects::target);
+                buildWithObjFiles(Projects::target);
             else 
-                _buildFromSource(Projects::target);
+                buildFromSource(Projects::target);
 
         }
     }
 
 
+
+    void parseBuildFlags() {
+        std::vector<int> indexes = getFlags();
+
+        for(int i : indexes) {
+            if(arguments[i].starts_with("-f")) {
+
+                std::string names = arguments[i].substr(3);
+
+
+                int lastComma;
+                for(;;) {
+                    int comma = names.find(',', lastComma);
+                    if(comma == names.npos)
+                        break;
+                    
+                    std::string name = names.substr(0, comma);
+
+                    lastComma = comma;
+                }
+
+            }
+        }
+    }
+
     // First compiles all file
     // After links them together
-    void _buildWithObjFiles(Project *t) {
+    void buildWithObjFiles(Project *t) {
 
         std::string out = t->getObjectPath() + "\\";
         // Creates output directories, if they doesn't exist
@@ -145,7 +182,7 @@ namespace console {
             t->getRoot(),
             t->getIncludeDirectories(),
             t->getLibarySearchingPaths(),
-            t->getDLs()
+            t->getLibraries()
         };
 
         auto objects = t->getObjFiles();
@@ -157,27 +194,16 @@ namespace console {
 
             objects.pop_back();
             sources.pop_back();
+
+            t->getObjFile("");
+
         }
 
 
     }
 
-
-    void _buildFromSource(Project *target) {
-
-    }
-
-    // returns list of directories
-    std::set<std::string> getDirectories(std::list<std::string> files) {
-        std::set<std::string> directories;
-
-        for(auto file : files) {
-            directories.emplace(getWorkingDirectory(file));
-        }
-
-        return directories;
-    }
-
+    
+    
     void initObjDirectories(Project *t, std::string objDirectory) {
         auto directories = t->getSourceDirectories();
         
@@ -195,24 +221,28 @@ namespace console {
         for(auto objFile : sources) {
             objFile.insert(0, objDirectory);
             objFile.replace(objFile.length()-3, 3, "o");
-
+            
             t->addObjFile( objFile );
         }
     }
+    
+    void buildFromSource(Project *target) {
 
-    // include supprot
-    std::string getIncludeFlags(Project *target) {
-        std::string inclFlag;
-        const std::list<std::string> &includes = target->getIncludeDirectories();
-        for(auto includeDirectory : includes) {
-            inclFlag.append("-I\"")
-                    .append(target->getObjectPath())
-                    .append("\\")
-                    .append(includeDirectory)
-                    .append("\" ");
-        }
-        return inclFlag;
     }
+
+
+
+    std::vector<int> getFlags() {
+        std::vector<int> indexes;
+        
+        for(int i = 0; i < arguments.size(); i++) {
+            if(arguments[i][0] == '-') 
+                indexes.push_back(i);
+        }
+
+        return indexes;
+    }
+
 
     std::string getStandartFlag(Project *target) {
         std::string s = "-std=c++";

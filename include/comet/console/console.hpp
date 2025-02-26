@@ -2,7 +2,7 @@
 
 #include <string>
 #include <list>
-#include <set>
+#include <vector>
 
 #include <filesystem>
 
@@ -16,7 +16,7 @@ namespace console {
     
     void parseArguments(int argc, const char **args);
 
-    void parseCommand(std::string command, std::string *args, int argc);
+    void parseCommand();
 
     void readScript();
 
@@ -24,34 +24,58 @@ namespace console {
 
     void setup(fs::path where);
     
+    
+    // Build command
+
     void build(std::string name);
+
+    /**
+     * This function parses build flags. 
+     * 
+     * Searches strings which starts with '-', after sets value of required
+     * flags
+     * 
+     * Flags:
+     * -debug-info
+     * -save-info
+     * -f
+     * -V
+     * -r
+     * -to
+     */
+    void parseBuildFlags();
+
 
                       /*----------Support functions---------*/
 
     // Building support
     // Creates o-files
-    void _buildWithObjFiles(Project *p);
+    void buildWithObjFiles(Project *p);
 
     // Compiles immediatly
-    void _buildFromSource(Project *p);
-
+    
     // 
     void initObjDirectories(
         Project *t, 
         std::string objDirectory
     );
+    
+    void buildFromSource(Project *p);
 
-    // include supprot
-    std::string getIncludeFlags(Project *target);
+    void buildOnly(std::list<std::string> files);
 
-    // standart specifying support
+    /**
+     * This function returns vector of indexes on that places
+     * flags (words that starts with '-')
+     * 
+     */
+    std::vector<int> getFlags();
+
+
     std::string getStandartFlag(Project *target);
 
 
-
     // returns list of directories
-    std::set<std::string> getDirectories(std::list<std::string> files);
-
     std::string getDirectory(std::string dir);
 
 }

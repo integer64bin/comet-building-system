@@ -7,12 +7,14 @@ namespace comet {
 class SubprocessError : public ConsoleError {
 public:
 
+    SubprocessError(int code);
+
     SubprocessError(const std::string &message, int errorCode);
 
 
 private:
 
-    std::string identifyErrorCode(int code);
+    std::string identifyErrorCode();
 
 };
 

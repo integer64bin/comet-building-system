@@ -1,5 +1,7 @@
 #include <project\project.hpp>
 
+#include <exception\console\CommandError.hpp>
+
 namespace comet {
 
 Project::Project() { }
@@ -18,6 +20,13 @@ Project::Project(Configs conf) : m_configurations(conf) { }
 
 void Project::addSource(std::string file) {
     m_configurations.sources.push_back(file);
+
+    int lastSlash = file.rfind('\\');
+    m_configurations.sourceByName.emplace(
+        file.substr(lastSlash+1),
+        file
+    );
+
 }
 
 std::list<std::string> Project::getSources() {
@@ -30,6 +39,16 @@ void Project::addSourceDirectory(std::string dir) {
     
 std::list<std::string> Project::getSourceDirectories() {
     return m_configurations.sourceDirectories;
+}
+
+std::string Project::getSource(std::string name) {
+    if(constainsSource(name))
+        return m_configurations.sourceByName.at(name);
+    throw CommandError( std::string("Unknown source file name: ").append(name) );
+}
+
+bool  Project::constainsSource(std::string name) {
+    return m_configurations.sourceByName.contains(name);
 }
 
                     /*--------------Includes--------------*/
@@ -58,32 +77,23 @@ bool Project::hasIncludes() {
 
 // Dynamic
 void Project::addLibarySearchingPath(std::string dir) {
-    m_configurations.dllsDirectory.push_back(dir);
+    m_configurations.libFolders.push_back(dir);
 }
 
 
 std::list<std::string> Project::getLibarySearchingPaths() {
-    return m_configurations.dllsDirectory;
+    return m_configurations.libFolders;
 }
 
-void Project::addDL(std::string name) {
-    m_configurations.dlls.push_back(name);
-}
-
-
-std::list<std::string> Project::getDLs() {
-    return m_configurations.dlls;
+void Project::addLibrary(std::string name) {
+    m_configurations.libraries.push_back(name);
 }
 
 
-// Satic
-void Project::addSL(std::string fullname) {
-    m_configurations.sls.push_back(fullname);
+std::list<std::string> Project::getLibraries() {
+    return m_configurations.libraries;
 }
 
-std::list<std::string> &Project::getSLs() {
-    return m_configurations.sls;
-}
 
 std::string Project::getName() {
     return m_configurations.name;
@@ -149,10 +159,26 @@ std::string Project::getObjectPath() {
 
 void Project::addObjFile(std::string file) {
     m_configurations.objFiles.push_back(file);
+
+    int lastSlash = file.rfind('\\');
+    m_configurations.objByName.emplace(
+        file.substr(lastSlash+1),
+        file
+    );
 }
 
 std::list<std::string> Project::getObjFiles() {
     return m_configurations.objFiles;
+}
+
+std::string Project::getObjFile(const std::string &name) {
+    if(containsObject(name)) 
+        return m_configurations.objByName.at(name);
+    throw CommandError( std::string("Unknown source file name: ").append(name) );
+}
+
+bool Project::containsObject(const std::string &name) {
+    return m_configurations.objByName.contains(name);
 }
 
                     /*------------Output path------------*/

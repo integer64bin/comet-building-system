@@ -5,6 +5,8 @@
 
 #include <map>
 
+#include <exception\console\SubprocessError.hpp>
+
 namespace comet {
 
 namespace system {
@@ -35,6 +37,7 @@ namespace system {
         ) {
             std::cerr << "CreateProcess failed (" << GetLastError() << ')' << std::endl;
             return false;
+            throw SubprocessError(GetLastError());
         }
 
         WaitForSingleObject(processInfo.hThread, INFINITE);
@@ -69,7 +72,7 @@ namespace system {
 
     }
 
-    std::string indetifyErrorCode(int code) {
+    std::string identifyErrorCode(int code) {
         if(ERRORS_MESSAGES.contains(code))
             return ERRORS_MESSAGES.at(code);
         return "Unknow error";

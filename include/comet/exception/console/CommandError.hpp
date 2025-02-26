@@ -11,6 +11,8 @@ public:
 
     CommandError() = default;
 
+    CommandError(const std::string &message);
+    
 };
 
 

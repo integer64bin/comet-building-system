@@ -8,7 +8,7 @@ namespace system {
 
     bool createProcess(std::string name, std::string args);
  
-    std::string indetifyErrorCode(int code);
+    std::string identifyErrorCode(int code);
 
     void init();
 

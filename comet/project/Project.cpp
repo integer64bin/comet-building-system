@@ -56,13 +56,23 @@ bool Project::hasIncludes() {
 
                         /*-----------Libraries------------*/
 
+// Dynamic
 void Project::addLibarySearchingPath(std::string dir) {
     m_configurations.dllsDirectory.push_back(dir);
 }
 
-// Dynamic
+
+std::list<std::string> Project::getLibarySearchingPaths() {
+    return m_configurations.dllsDirectory;
+}
+
 void Project::addDL(std::string name) {
     m_configurations.dlls.push_back(name);
+}
+
+
+std::list<std::string> Project::getDLs() {
+    return m_configurations.dlls;
 }
 
 

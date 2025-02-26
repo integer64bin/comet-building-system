@@ -19,6 +19,8 @@ struct CompilerOptions {
 
     const std::list<std::string> &dllSearchingPaths;
 
+    const std::list<std::string> &dlls;
+
 };
 
 class Compiler {

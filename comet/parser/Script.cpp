@@ -8,6 +8,8 @@
 #include <Lexer.hpp>
 #include <Parser.hpp>
 
+#include <exception\ParserError.hpp>
+
 namespace comet {
 
 Script::Script(const std::string &path) {
@@ -29,8 +31,13 @@ void Script::perform() {
 
     Parser parser(lexer.tokenize(), *this);
 
-    parser.parse();
-
+    try {
+        parser.parse();
+    } catch(ParserError &e) {
+        std::cerr << "An error occurred during execution" << std::endl;
+        std::cerr << e.what() << std::endl;
+        std::exit(1);
+    }
 }
 
 

@@ -18,7 +18,8 @@ class Lexer {
     // Resulting list of tokens
     std::vector<Token> m_tokens;
 
-
+    // debug info
+    std::size_t m_line = 0;
     
     const static char eof;
 
@@ -54,7 +55,11 @@ private:
 
     // List-util methods
 
-    inline void add(TokenType type, std::string text = "");
+    inline void add(
+        TokenType type, 
+        std::string text = "", 
+        std::size_t line = 0
+    );
 
 };
 

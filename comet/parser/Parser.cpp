@@ -3,13 +3,16 @@
 #include <iostream>
 #include <cstdlib>
 
+// Expressions
 #include <ast\expression\NumberExpression.hpp>
 #include <ast\expression\StringExpression.hpp>
 #include <ast\expression\AccessExpression.hpp>
 
+// Statements
 #include <ast\statement\FunctionStatement.hpp>
 #include <ast\statement\AssignmentStatement.hpp>
 
+// Exceptions
 #include <exception\parser\UnknownExpression.hpp>
 #include <exception\parser\UnexpectedToken.hpp>
 
@@ -17,7 +20,7 @@
 
 namespace comet {
 
-const Token Parser::eof(TokenType::EOF_, "");
+const Token Parser::eof(TokenType::EOF_, "", 0);
 
 
 Parser::Parser(std::vector<Token> tokens, Script &target) : 
@@ -71,7 +74,7 @@ bool Parser::look(TokenType type, std::size_t relativePos) {
 void Parser::consume(TokenType type) {
     if(match(type)) return;
     else {
-        throw UnexpectedTokenException(type, get(0).getType());
+        throw UnexpectedTokenError(type, get(0).getType());
     }
 }
 
@@ -131,7 +134,9 @@ Expression *Parser::primary() {
     } else if(look(TokenType::WORD)) {
         result = new AccessExpression( next().getText() );
     } else {
-        throw UnknownExprssionException("Unknown expression: ");
+        throw UnknownExprssionError(
+            std::string("at line ").append(std::to_string(get(0).getLine()))
+        );
     }
     return result;
 }

@@ -51,12 +51,12 @@ void Lexer::tokenizeNumber() {
         next();
     }
     number = m_src.substr(s, m_index-s);
-    add(TokenType::NUMBER, number.data());
+    add(TokenType::NUMBER, number.data(), m_line);
 }
 
 
 void Lexer::tokenizeOperator() {
-    add(static_cast<TokenType>( get() ), m_src.substr(m_index, 1).data() );
+    add(static_cast<TokenType>( get() ), m_src.substr(m_index, 1).data(), m_line);
     next();
 }
 
@@ -96,11 +96,15 @@ char Lexer::get(size_t relativePos) {
 }
 
 inline char Lexer::peek() {
+    if(m_src[m_index] = '\n')
+        m_line++;
     char c = m_src[m_index++];
     return c == 0 ? eof : c;
 }
 
 inline char Lexer::next() {
+    if(m_src[m_index] == '\n')
+        m_line++;
     return m_src[m_index++];
 }
 
@@ -114,8 +118,8 @@ inline bool Lexer::isOperator() {
 }
 
 
-inline void Lexer::add(TokenType type, std::string text) {
-    m_tokens.push_back(Token(type, text));
+inline void Lexer::add(TokenType type, std::string text, std::size_t line) {
+    m_tokens.push_back(Token(type, text, line));
 }
 
 

@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include <project\project.hpp>
+#include <project\sys\system.hpp>
 
 namespace comet {
 
@@ -154,10 +155,11 @@ void callByName(std::string funcName, std::vector<Value *> arguments) {
 
 
 void Projects::init() {
-
+    comet::system::init();
 }
 
 void Projects::finalize() {
+    comet::system::finalize();
     for(auto proj : projects) {
         delete proj.second;
     }

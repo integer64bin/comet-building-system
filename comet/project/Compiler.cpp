@@ -14,32 +14,40 @@ std::string getIncludeFlags(const std::list<std::string> &includes,
 /*==========================Methods' implementations==========================*/
 
 void Compiler::compile(CompilerOptions &opts, std::string src, std::string out) {
-    std::string options;
+    std::string arguments;
     
     if(!opts.includes.empty()) {
         std::string inclFlag = getIncludeFlags(opts.includes, "");
 
-        options.append(inclFlag);
+        arguments.append(inclFlag);
 
     }
 
     /// \todo libraries
     
-    options.append(opts.flags)
+    arguments.append(opts.flags)
            .append(" -c -o ")
            .append(src + ' ')
            .append(out);
 
-    std::cout << options << std::endl;
+    std::cout << arguments << std::endl;
 
-    system::createProcess("g++", options);
+    system::createProcess(opts.compiler, arguments);
 
 }
 
 // Linking
 // -o
 void Compiler::link(CompilerOptions &opts, std::list<std::string> files, bool sources) {
-    
+    if(sources) {
+
+    }
+
+
+    if(!opts.dllSearchingPaths.empty()) {
+
+    }
+
 }
 
 

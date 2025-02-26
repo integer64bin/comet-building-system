@@ -9,7 +9,7 @@ class CommandError : public ConsoleError {
 
 public:
 
-    CommandError();
+    CommandError() = default;
 
 };
 

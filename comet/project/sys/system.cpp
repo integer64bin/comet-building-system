@@ -3,9 +3,13 @@
 #include <iostream>
 #include <windows.h>
 
+#include <map>
+
 namespace comet {
 
 namespace system {
+
+    std::map<int, std::string> ERRORS_MESSAGES;
 
     bool createProcess(std::string name, std::string args) {
         STARTUPINFO si;
@@ -40,6 +44,36 @@ namespace system {
         return true;
     }
 
+    void init() {
+
+        ERRORS_MESSAGES.emplace(
+            0, "No error"
+        );
+
+        ERRORS_MESSAGES.emplace(
+            1, "Incorrect fuction"
+        );
+
+        ERRORS_MESSAGES.emplace(
+            2, "The system cannot find the file specified"
+        );
+
+        ERRORS_MESSAGES.emplace(
+            87, "The parameter is incorrect"
+        );
+
+
+    }
+
+    void finalize() {
+
+    }
+
+    std::string indetifyErrorCode(int code) {
+        if(ERRORS_MESSAGES.contains(code))
+            return ERRORS_MESSAGES.at(code);
+        return "Unknow error";
+    }
 
 }
 

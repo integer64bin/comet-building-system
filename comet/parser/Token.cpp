@@ -2,8 +2,9 @@
 
 namespace comet {
 
-Token::Token(TokenType type, std::string text) : 
-            m_type(type), m_text(text) { }
+Token::Token(TokenType type, std::string text, std::size_t line) : 
+            m_type(type), m_text(text), m_line(line) { }
+
 
 TokenType Token::getType() const {
     return m_type;
@@ -11,6 +12,10 @@ TokenType Token::getType() const {
 
 std::string Token::getText() const {
     return m_text;
+}
+
+std::size_t Token::getLine() const {
+    return m_line;
 }
 
 

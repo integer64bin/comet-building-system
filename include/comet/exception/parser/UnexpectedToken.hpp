@@ -2,15 +2,15 @@
 
 #include <token\Token.hpp>
 
-#include <exception\ParserException.hpp>
+#include <exception\ParserError.hpp>
 
 namespace comet {
 
-class UnexpectedTokenException : public ParserException {
+class UnexpectedTokenError : public ParserError {
 
 public:
 
-    UnexpectedTokenException(const TokenType &expected, const TokenType &actual);
+    UnexpectedTokenError(const TokenType &expected, const TokenType &actual);
 
 };
 

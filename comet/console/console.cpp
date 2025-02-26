@@ -1,7 +1,7 @@
 #include <console\console.hpp>
 
-#include <iostream>
-#include <fstream>
+#include <iostream> // condole output
+#include <fstream>  // file reading/writing
 
 #include <util.hpp>
 #include <project\project.hpp>
@@ -59,7 +59,7 @@ namespace console {
 
          
         } else if(command.compare("help") == 0) {
-
+            
         } else { // commands that require script
             readScript();
             
@@ -144,7 +144,8 @@ namespace console {
             Compiler::getFlags({stdFlag, "-pipe"}),
             t->getRoot(),
             t->getIncludeDirectories(),
-            t->getIncludeDirectories()
+            t->getLibarySearchingPaths(),
+            t->getDLs()
         };
 
         auto objects = t->getObjFiles();

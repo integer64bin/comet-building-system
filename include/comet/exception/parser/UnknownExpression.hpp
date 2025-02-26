@@ -1,15 +1,15 @@
 #pragma once
 
-#include <exception\ParserException.hpp>
+#include <exception\ParserError.hpp>
 
 namespace comet {
 
-class UnknownExprssionException : public ParserException {
+class UnknownExprssionError : public ParserError {
 public:
 
-    UnknownExprssionException(const std::string& error);
+    UnknownExprssionError(const std::string& error);
 
-    const char* what() const noexcept override;
+    // const char* what() const noexcept override;
 
 
 };

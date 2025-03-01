@@ -7,6 +7,7 @@
 
 #include <exception\console\SubprocessError.hpp>
 
+
 namespace comet {
 
 namespace system {
@@ -14,9 +15,9 @@ namespace system {
     std::map<int, std::string> ERRORS_MESSAGES;
 
     bool createProcess(std::string name, std::string args) {
+        
         STARTUPINFO si;
         PROCESS_INFORMATION processInfo;
-
 
         ZeroMemory( &si, sizeof(si) );
         si.cb = sizeof(si);
@@ -24,7 +25,7 @@ namespace system {
 
         char* command = const_cast<char*>( (name + ' ' + args).c_str() );
 
-        if( !CreateProcess( NULL,   // No module name (use command line)
+        if(!CreateProcess( NULL,   // No module name (use command line)
             command,        // Command line
             NULL,           // Process handle not inheritable
             NULL,           // Thread handle not inheritable
@@ -33,10 +34,8 @@ namespace system {
             NULL,           // Use parent's environment block
             NULL,           // Use parent's starting directory 
             &si,            // Pointer to STARTUPINFO structure
-            &processInfo)            // Pointer to PROCESS_INFORMATION structure
+            &processInfo)           // Pointer to PROCESS_INFORMATION structure
         ) {
-            std::cerr << "CreateProcess failed (" << GetLastError() << ')' << std::endl;
-            return false;
             throw SubprocessError(GetLastError());
         }
 

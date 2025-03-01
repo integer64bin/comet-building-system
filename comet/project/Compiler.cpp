@@ -1,15 +1,20 @@
 #include <project\project.hpp>
 
+#include <iostream>
+
 #include <project\sys\system.hpp>
 
-#include <iostream>
+#include <exception\console\SubprocessError.hpp>
 
 namespace comet {
 
+/*==================================Variables=================================*/
 
-std::string getIncludeFlags(const std::list<std::string> &includes, 
-                            const std::string root);
+bool Compiler::debug_info    = false;
 
+bool Compiler::ignore_errors = false;
+
+size_t Compiler::erros_count = 0;
 
 /*==========================Methods' implementations==========================*/
 
@@ -22,23 +27,48 @@ void Compiler::compile(CompilerOptions &opts, std::string src, std::string out) 
         arguments.append(inclFlag);
 
     }
-
-    /// \todo libraries
     
-    arguments.append(opts.flags)
-           .append(" -c -o ")
-           .append(src + ' ')
-           .append(out);
+    if(!opts.flags.empty())
+        arguments.append(opts.flags);
+    if(out.empty()) {
+        arguments.append(" -c ")
+                 .append(src);
+    } else {
+        arguments.append(" -c -o ")
+                 .append(src + ' ')
+                 .append(out);
+    }
+    
+    
+    if(debug_info)
+        std::cout << opts.compiler << ' ' << arguments << std::endl;
 
-    std::cout << arguments << std::endl;
-
-    system::createProcess(opts.compiler, arguments);
-
+    try {
+        system::createProcess(opts.compiler, arguments);
+    } catch(SubprocessError e) {
+        if(!ignore_errors) {
+            std::cerr << "An error occured during building" << std::endl;
+            std::cerr << e.what() << std::endl;
+            std::cerr << "Compilation interrupted" << std::endl;
+            std::exit(1);
+        } else {
+            std::cerr << "An error occured during building" << std::endl;
+            std::cerr << e.what() << std::endl;
+            std::cout << "Compilation continues" << std::endl;
+            erros_count++;
+            return;
+        }
+    }
 }
 
 // Linking
 // -o
 void Compiler::link(CompilerOptions &opts, std::list<std::string> files, bool sources) {
+    if(erros_count) {
+        std::cout << "Linking don't performs, because errors "
+        "occured during compiltion" << std::endl;
+        std::exit(1);
+    }
     if(sources) {
 
     }
@@ -74,7 +104,7 @@ std::string Compiler::getFlags(std::initializer_list<std::string> flags) {
     return result;
 }
 
-std::string getIncludeFlags(const std::list<std::string> &includes,
+std::string Compiler::getIncludeFlags(const std::list<std::string> &includes,
                             const std::string root) {
     std::string inclFlag;
     for(auto includeDirectory : includes) {

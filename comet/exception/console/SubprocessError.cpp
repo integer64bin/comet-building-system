@@ -15,6 +15,11 @@ SubprocessError::SubprocessError(const std::string &message, int errorCode)
 }
 
 
+int SubprocessError::getCode() {
+    return m_code;
+}
+
+
 std::string SubprocessError::identifyErrorCode() {
     return system::identifyErrorCode(m_code);
 }

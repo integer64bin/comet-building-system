@@ -2,6 +2,8 @@
 
 #include <exception\console\CommandError.hpp>
 
+#include <iostream>
+
 namespace comet {
 
 Project::Project() { }
@@ -41,13 +43,15 @@ std::list<std::string> Project::getSourceDirectories() {
     return m_configurations.sourceDirectories;
 }
 
-std::string Project::getSource(std::string name) {
-    if(constainsSource(name))
+std::string Project::getSource(const std::string &name) {
+    if(constainsSource(name)) {
+        std::cout << name << std::endl;
         return m_configurations.sourceByName.at(name);
+    }
     throw CommandError( std::string("Unknown source file name: ").append(name) );
 }
 
-bool  Project::constainsSource(std::string name) {
+bool  Project::constainsSource(const std::string &name) {
     return m_configurations.sourceByName.contains(name);
 }
 
@@ -161,8 +165,11 @@ void Project::addObjFile(std::string file) {
     m_configurations.objFiles.push_back(file);
 
     int lastSlash = file.rfind('\\');
+    std::string keyFile = file.substr(lastSlash+1);
+    keyFile.replace(keyFile.length()-1, 1, "cpp");
+    std::cout << keyFile << std::endl;
     m_configurations.objByName.emplace(
-        file.substr(lastSlash+1),
+        keyFile,
         file
     );
 }

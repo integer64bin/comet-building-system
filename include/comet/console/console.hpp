@@ -27,7 +27,7 @@ namespace console {
     
     // Build command
 
-    void build(std::string name);
+    void build();
 
     /**
      * This function parses build flags. 
@@ -48,28 +48,38 @@ namespace console {
 
                       /*----------Support functions---------*/
 
-    // Building support
-    // Creates o-files
-    void buildWithObjFiles(Project *p);
+    /**
+     * @brief Compiles all files that project has, saves result to folder of
+     * object files. After compilation performs linking of obj files.
+     * If compilation errors occur doesn't perfrom linking
+     */
+    // void buildWithObjFiles();
 
+    /**
+     * @brief Compiles only specified files, saves result to folder of
+     * object files. After compilation performs linking of obj files.
+     * If compilation errors occur doesn't perfrom linking
+     * 
+     * If names empty compiles all source files
+     * 
+     * @param names list of names of source files
+     */
+    void buildWithObjFiles(std::list<std::string> names = {});
+    
     // Compiles immediatly
     
     // 
-    void initObjDirectories(
-        Project *t, 
-        std::string objDirectory
-    );
+    void initObjDirectories(std::string objDirectory);
     
-    void buildFromSource(Project *p);
+    void buildFromSource();
 
-    void buildOnly(std::list<std::string> files);
 
     /**
      * This function returns vector of indexes on that places
      * flags (words that starts with '-')
      * 
      */
-    std::vector<int> getFlags();
+    std::vector<std::size_t> getFlags();
 
 
     std::string getStandartFlag(Project *target);

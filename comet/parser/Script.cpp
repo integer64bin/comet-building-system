@@ -44,7 +44,11 @@ void Script::perform() {
 void Script::execute() {
     for(auto st : m_statements) {
         if(st) {
-            st->execute();
+            try{
+                st->execute();
+            } catch(...) { 
+                throw; // All exceptions handles in console.cpp
+            }
         }
     }
 }

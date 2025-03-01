@@ -4,6 +4,8 @@
 
 #include <ast\expression\Expression.hpp>
 
+#include <exception\execution\UnknownVariable.hpp>
+
 namespace comet {
 
 

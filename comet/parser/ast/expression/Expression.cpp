@@ -4,6 +4,8 @@
 
 #include <project\project.hpp>
 
+#include <exception\execution\UnknownVariable.hpp>
+
 namespace comet {
     
 /*=============================String expression=============================*/
@@ -50,7 +52,7 @@ AccessExpression::AccessExpression(std::string_view name) : m_name(name.data()) 
 Value *AccessExpression::eval() {
     if(Projects::target->contains(m_name.data()))
         return Projects::target->getVaribale(m_name);
-    return nullptr;
+    throw UnknownVariable(m_name);
 }
 
 } // namespace comet

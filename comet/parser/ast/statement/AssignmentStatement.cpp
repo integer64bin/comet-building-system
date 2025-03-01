@@ -2,6 +2,8 @@
 
 #include <project\project.hpp>
 
+#include <iostream>
+
 namespace comet {
 
 AssignmentStatement::AssignmentStatement(
@@ -14,7 +16,11 @@ AssignmentStatement::~AssignmentStatement() {
 }
 
 void AssignmentStatement::execute() {
-    setVariable(m_varName, m_value->eval());
+    try {
+        setVariable(m_varName, m_value->eval());
+    } catch(...) {
+        throw;
+    }
 }
 
 }

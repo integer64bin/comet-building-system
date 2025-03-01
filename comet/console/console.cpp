@@ -9,6 +9,8 @@
 #include <Script.hpp>
 
 #include <exception\console\CommandError.hpp>
+#include <exception\execution\ExecutionError.hpp>
+#include <exception\execution\UnknownVariable.hpp>
 
 namespace comet {
 
@@ -50,7 +52,13 @@ namespace console {
         // befor last '\' comes working directory
         workspace = getWorkingDirectory(arguments[0]);
 
-        parseCommand();
+        try { 
+            parseCommand();
+        } catch(ConsoleError &e) {
+            std::cerr << "An error occured during command execution..." << std::endl;
+            std::cerr << e.what() << std::endl;
+            std::exit(1); 
+        }
     }
 
     void parseCommand() {
@@ -59,7 +67,7 @@ namespace console {
 
         std::string command = arguments[1];
 
-        if(command.compare("setup") == 0) {
+        if(command.compare("init") == 0) {
             fs::path dir;
             if(argc == 0 || (argc == 1 && arguments[2].compare("."))) {
                 dir = fs::path(workspace);
@@ -74,12 +82,8 @@ namespace console {
             
         } else { // commands that require script
             readScript();
-            
             if(command.compare("build") == 0) {
-                if(argc == 0) {
-                    build("");             
-                } else
-                    build(arguments[2]);
+                build();
             } else if(command.compare("link") == 0) {
 
             } else if(command.compare("info") == 0) {
@@ -94,8 +98,12 @@ namespace console {
         Script script(workspace + "\\.xconfig");
 
         script.perform();
-
-        script.execute();
+        try {
+            script.execute();
+        } catch(ExecutionError &e) {
+            std::cerr << e.what() << std::endl;
+            std::exit(1);
+        }
     }
 
 
@@ -117,95 +125,169 @@ namespace console {
     }
 
     
-    void build(std::string name) {
+    /**
+     * Variables below are spectial build flags
+     */
+    // 
+    bool selective_compilation;
+
+    bool run_after;
+    
+    void build() {
+        // First step falgs parsing
+        std::vector<std::size_t> indexes = getFlags();
+
+        // build flags parsing
+
+        // Files specified by "f" flag
+        std::list<std::string> selectedFiles;
+
+        // Arguments specified by "r" falg
+        std::string startArgs;
+
+        for(std::size_t i : indexes) {
+            if(arguments[i].starts_with("-f")) {
+                selective_compilation = true;
+                // Two cases:
+                // 1) One file: -ffile
+                // 2) N files: -ffile0,fil1,...,filen
+                std::string names = arguments[i].substr(2);
+                // case 1
+                if(names.find(',') == names.npos){
+                    selectedFiles.push_back(names);
+                } else { // case 2
+                    int lastComma;
+                    for(;;) {
+                        int comma = names.find(',', lastComma);
+                        if(comma == names.npos)
+                            break;
+                        
+                        std::string name = names.substr(0, comma);
+                        
+                        selectedFiles.push_back(name);
+
+                        lastComma = comma;
+                    }
+                }
+            } else if(arguments[i].compare("--debug-info") == 0) { 
+                Compiler::debug_info = true;
+            } else if(arguments[i].compare("--ignore-errors") == 0) {
+                Compiler::ignore_errors = true;
+            } else if(arguments[i].starts_with("-r")) {
+                std::string startArgsList = arguments[i].substr(3);
+                // Two cases
+                // 1) One argument: -r--arg0
+                // 2) N arguments: -r-o,-f,-s,--aeg0...
+                
+                // case 1
+                if(startArgsList.find(',') == startArgsList.npos) {
+                    startArgs = std::move(startArgsList);
+                } else { // case 2
+                    int lastComma;
+                    for(;;) {
+                        int comma = startArgsList.find(',', lastComma);
+                        if(comma == startArgsList.npos)
+                            break;
+                        
+                        std::string arg = startArgsList.substr(0, comma);
+
+                        startArgs.append(arg).push_back(' ');
+
+                        lastComma = comma;
+                    }
+                }
+            }
+        }
+        
+        std::string name = arguments[2].starts_with("-") ? 
+                                    "" : arguments[2];
+
+        // Building 
         if(name.empty()) {
             if(!Projects::projects.empty() && Projects::projects.size() > 1) {
-                throw CommandError();
+                throw InvalidArgument(
+                    "Configuration file provides more than one project\n"
+                    "Wasn't specified name of project"
+                );
             }
 
+            
             name = Projects::target->getName();
-
-            std::cout << "Starting to build project " <<
-                    Projects::target->getName() << std::endl;
-
-
-            if(Projects::target->hasObjectsPath())
-                buildWithObjFiles(Projects::target);
-            else 
-                buildFromSource(Projects::target);
-
+            current = Projects::target;
+        } else {
+            if(!Projects::projects.contains(name)) {}
+                throw UnknownProject(name);
+            current = Projects::projects.at(name);
+            name = current->getName();
         }
+        
+        std::cout << "Starting to build project " << name << std::endl;
+
+        if(selective_compilation) {
+            buildWithObjFiles(selectedFiles);
+        } else if(current->hasObjectsPath())
+            buildWithObjFiles();
+        else 
+            buildFromSource();
+
+        if(run_after && Compiler::erros_count == 0) {
+            Projects::run(name, startArgs);
+        }
+
     }
 
 
 
-    void parseBuildFlags() {
-        std::vector<int> indexes = getFlags();
-
-        for(int i : indexes) {
-            if(arguments[i].starts_with("-f")) {
-
-                std::string names = arguments[i].substr(3);
-
-
-                int lastComma;
-                for(;;) {
-                    int comma = names.find(',', lastComma);
-                    if(comma == names.npos)
-                        break;
-                    
-                    std::string name = names.substr(0, comma);
-
-                    lastComma = comma;
-                }
-
-            }
-        }
-    }
-
-    // First compiles all file
-    // After links them together
-    void buildWithObjFiles(Project *t) {
-
-        std::string out = t->getObjectPath() + "\\";
+    void buildWithObjFiles(std::list<std::string> names) {
+        std::string out = current->getObjectPath() + "\\";
         // Creates output directories, if they doesn't exist
         // Also adds object files to Project::m_configurations.objFiles
-        initObjDirectories(t, out);
+        initObjDirectories(out);
         
         // Specifies c++ standart
-        std::string stdFlag = getStandartFlag(t);
+        std::string stdFlag = getStandartFlag(current);
 
 
         CompilerOptions opts {
-            t->getCompiler(),
+            current->getCompiler(),
             Compiler::getFlags({stdFlag, "-pipe"}),
-            t->getRoot(),
-            t->getIncludeDirectories(),
-            t->getLibarySearchingPaths(),
-            t->getLibraries()
+            current->getRoot(),
+            current->getIncludeDirectories(),
+            current->getLibarySearchingPaths(),
+            current->getLibraries()
         };
 
-        auto objects = t->getObjFiles();
-        auto sources = t->getSources();
-        
-        while(objects.size() > 0) {
+        // Compilation
+        if(names.empty()) {
+            auto objects = current->getObjFiles();
+            auto sources = current->getSources();
             
-            Compiler::compile(opts, objects.back(), sources.back());
+            while(objects.size() > 0) {
+                
+                Compiler::compile(opts, objects.back(), sources.back());
+    
+                objects.pop_back();
+                sources.pop_back();
+    
+            }
+        } else { // -f...
+            for(auto name : names) {
+                std::string src = current->getSource(name);
+                std::string obj = current->getObjFile(name);
 
-            objects.pop_back();
-            sources.pop_back();
-
-            t->getObjFile("");
-
+                Compiler::compile(opts, src, obj);
+            }
         }
 
+        // Linking
+        Compiler::link(opts, current->getObjFiles());
 
     }
 
     
     
-    void initObjDirectories(Project *t, std::string objDirectory) {
-        auto directories = t->getSourceDirectories();
+    void initObjDirectories(std::string objDirectory) {
+        auto directories = current->getSourceDirectories();
         
         // creating output directories
         for(auto entry : directories) {
@@ -216,26 +298,26 @@ namespace console {
             }
         }
 
-        auto sources = t->getSources();
+        auto sources = current->getSources();
 
         for(auto objFile : sources) {
             objFile.insert(0, objDirectory);
             objFile.replace(objFile.length()-3, 3, "o");
             
-            t->addObjFile( objFile );
+            current->addObjFile( objFile );
         }
     }
     
-    void buildFromSource(Project *target) {
+    void buildFromSource() {
 
     }
 
 
 
-    std::vector<int> getFlags() {
-        std::vector<int> indexes;
+    std::vector<std::size_t> getFlags() {
+        std::vector<std::size_t> indexes;
         
-        for(int i = 0; i < arguments.size(); i++) {
+        for(std::size_t i = 0; i < arguments.size(); i++) {
             if(arguments[i][0] == '-') 
                 indexes.push_back(i);
         }

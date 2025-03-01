@@ -11,6 +11,7 @@ public:
 
     SubprocessError(const std::string &message, int errorCode);
 
+    int getCode();
 
 private:
 

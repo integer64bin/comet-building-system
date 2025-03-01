@@ -32,7 +32,11 @@ void FunctionStatement::execute() {
 std::vector<Value*> FunctionStatement::evalArguments() {
     std::vector<Value*> result;
     for(auto e : m_arguments) {
-        result.push_back(e->eval());
+        try {
+            result.push_back(e->eval());
+        } catch(...) {
+            throw;
+        }
     }
     return result;
 }

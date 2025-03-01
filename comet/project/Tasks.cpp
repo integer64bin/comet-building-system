@@ -153,6 +153,9 @@ void callByName(std::string funcName, std::vector<Value *> arguments) {
     }
 }
 
+int Projects::run(const std::string &name, const std::string &arguments) {
+    return 10;
+}
 
 void Projects::init() {
     comet::system::init();

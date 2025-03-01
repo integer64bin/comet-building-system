@@ -27,7 +27,7 @@ struct Configs {
     std::list<std::string> sources;
 
     // Allows access to source file by his name
-    std::map<std::string, const std::string&> sourceByName;
+    std::map<std::string, std::string> sourceByName;
 
     // Contains directories which contains .cpp files
     std::list<std::string> sourceDirectories;
@@ -39,7 +39,7 @@ struct Configs {
     std::list<std::string> objDirectories;
 
     // Allows access to object files by source file name
-    std::map<std::string, const std::string&> objByName;
+    std::map<std::string, std::string> objByName;
 
     // List of include directories
     std::list<std::string> includeDirectories;
@@ -108,7 +108,7 @@ public:
      * @param name name of searched source file
      * @return std::string 
      */
-    std::string getSource(std::string name);
+    std::string getSource(const std::string &name);
 
     /**
      * @brief 
@@ -117,7 +117,7 @@ public:
      * @return true  if source file with specified name exists
      * @return false in another case
      */
-    bool constainsSource(std::string name);
+    bool constainsSource(const std::string &name);
     
     /**
      * @brief Adds direcotory that contains source files
@@ -355,6 +355,16 @@ public:
 
     // The project that is being processed
     static Project *target;
+
+    /**
+     * @brief Run a project with specified name and pass him specified
+     * arguments
+     * 
+     * @param name name of project 
+     * @param arguments conactenated with arguments with witespace separation
+     * @return int
+     */
+    static int run(const std::string &name, const std::string &arguments);
 
     /**
      * @brief

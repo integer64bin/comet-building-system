@@ -264,7 +264,7 @@ namespace console {
             
             while(objects.size() > 0) {
                 
-                Compiler::compile(opts, objects.back(), sources.back());
+                Compiler::compile(opts, sources.back(), objects.back());
     
                 objects.pop_back();
                 sources.pop_back();

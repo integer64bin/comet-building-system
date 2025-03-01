@@ -31,12 +31,12 @@ void Compiler::compile(CompilerOptions &opts, std::string src, std::string out) 
     if(!opts.flags.empty())
         arguments.append(opts.flags);
     if(out.empty()) {
-        arguments.append(" -c ")
+        arguments.append("-c ")
                  .append(src);
     } else {
-        arguments.append(" -c -o ")
-                 .append(src + ' ')
-                 .append(out);
+        arguments.append("-c -o ")
+                 .append(out + ' ')
+                 .append(src);
     }
     
     

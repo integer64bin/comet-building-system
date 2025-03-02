@@ -70,7 +70,7 @@ void Compiler::link(CompilerOptions &opts, std::list<std::string> files, bool so
         std::exit(1);
     }
     if(sources) {
-
+        
     }
 
 

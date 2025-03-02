@@ -2,6 +2,7 @@
 
 #include <iostream> // condole output
 #include <fstream>  // file reading/writing
+#include <chrono>
 
 #include <util.hpp>
 #include <project\project.hpp>
@@ -75,7 +76,7 @@ namespace console {
                 dir = fs::path(workspace + "\\" + arguments[2]);
             }
 
-            setup(dir);
+            init(dir);
 
          
         } else if(command.compare("help") == 0) {
@@ -87,7 +88,7 @@ namespace console {
             } else if(command.compare("link") == 0) {
 
             } else if(command.compare("info") == 0) {
-
+                info();
             }
         }
     }
@@ -110,7 +111,7 @@ namespace console {
     /*============================Console command============================*/
 
     
-    void setup(fs::path where) {
+    void init(fs::path where) {
         where.append("\\.xconfig");
         // If file exists do nothing
         if(fs::exists(where))
@@ -128,9 +129,10 @@ namespace console {
     /**
      * Variables below are spectial build flags
      */
-    // 
+    // If files specified by flag "-f" it equals true
     bool selective_compilation;
 
+    // If programm has flag "-r" it equals true
     bool run_after;
     
     void build() {
@@ -156,17 +158,26 @@ namespace console {
                 if(names.find(',') == names.npos){
                     selectedFiles.push_back(names);
                 } else { // case 2
-                    int lastComma;
+                    int lastComma = 0;
+                    // Adding a first file
+                    int comma = names.find(',', lastComma+1);
+                    std::string name = names.substr(0, comma);
+                    selectedFiles.push_back(name);
                     for(;;) {
-                        int comma = names.find(',', lastComma);
-                        if(comma == names.npos)
-                            break;
+
+                        lastComma = comma;
+                        comma = names.find(',', lastComma+1);
                         
-                        std::string name = names.substr(0, comma);
+                        int count = comma == names.npos ? 
+                                    names.size()-lastComma-1 :
+                                    comma-lastComma-1;
+                        
+                        name = names.substr(lastComma+1, comma-lastComma-1);
                         
                         selectedFiles.push_back(name);
 
-                        lastComma = comma;
+                        if(comma == names.npos)
+                            break;
                     }
                 }
             } else if(arguments[i].compare("--debug-info") == 0) { 
@@ -183,17 +194,26 @@ namespace console {
                 if(startArgsList.find(',') == startArgsList.npos) {
                     startArgs = std::move(startArgsList);
                 } else { // case 2
-                    int lastComma;
+                    int lastComma = 0;
+                    // Adding a first file
+                    int comma = startArgsList.find(',', lastComma+1);
+                    std::string arg = startArgsList.substr(0, comma);
+                    startArgs.append(arg).push_back(' ');
                     for(;;) {
-                        int comma = startArgsList.find(',', lastComma);
-                        if(comma == startArgsList.npos)
-                            break;
+                        lastComma = comma;
+                        comma = startArgsList.find(',', lastComma);
                         
-                        std::string arg = startArgsList.substr(0, comma);
+                        int count = comma == startArgsList.npos ? 
+                                    startArgsList.size()-lastComma-1 :
+                                    comma-lastComma-1;
+                        
+                        arg = startArgsList.substr(lastComma+1, count);
 
                         startArgs.append(arg).push_back(' ');
 
                         lastComma = comma;
+                        if(comma == startArgsList.npos)
+                            break;
                     }
                 }
             }
@@ -312,6 +332,72 @@ namespace console {
 
     }
 
+
+    bool show_sources  = false;
+    bool    full_names = false;
+    
+
+    bool shInclude     = false;
+    bool    all_files  = false;
+
+    bool shRoot    = false; 
+
+    void info() {
+        std::vector<std::size_t> indexes = getFlags();
+
+        std::string name;
+
+        if(arguments.size() > 2) {
+            for(int i = 2; i < arguments.size(); i++) {
+                if(arguments[i].starts_with('-')) {
+                    if(arguments[i].compare("--full-names"))
+                        full_names = true;
+                    if(arguments[i].compare("--all-files"))
+                        all_files = true;
+                } else {
+                    if(arguments[i].compare("sources") == 0) 
+                        show_sources = true;
+                    else if(arguments[i].compare("includes") == 0)
+                        shInclude = true;
+                    else if(arguments[i].compare("root") == 0)
+                        shRoot = true;
+                    // else {
+                    //     name = arguments[i];
+                    //     current = Projects::projects.at(name);
+                    // }
+                }
+            }
+        }
+
+        current = Projects::target;
+
+        fs::directory_entry e;
+
+        fs::path p("");
+
+
+        if(show_sources) {
+            std::cout << " Sources\n";
+            if(!full_names) {
+                auto filesTable = current->getFilesTable();
+                for(auto pair : filesTable) {
+                    std::cout << std::format("{}.{}.{}")
+                              << pair.first << '\n';
+                }
+                std::cout << " Total: " << filesTable.size() << std::endl;
+            } else {
+                auto files = current->getSources();
+                for(auto file : files) {
+                    std::cout << '\t' << file << '\n';
+                }
+                std::cout << " Total: " << files.size() << std::endl;
+            }
+        }
+
+
+
+
+    }
 
 
     std::vector<std::size_t> getFlags() {

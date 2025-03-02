@@ -51,8 +51,12 @@ std::string Project::getSource(const std::string &name) {
     throw CommandError( std::string("Unknown source file name: ").append(name) );
 }
 
-bool  Project::constainsSource(const std::string &name) {
+bool Project::constainsSource(const std::string &name) {
     return m_configurations.sourceByName.contains(name);
+}
+
+std::map<std::string, std::string> Project::getFilesTable() {
+    return m_configurations.sourceByName;
 }
 
                     /*--------------Includes--------------*/
@@ -167,7 +171,6 @@ void Project::addObjFile(std::string file) {
     int lastSlash = file.rfind('\\');
     std::string keyFile = file.substr(lastSlash+1);
     keyFile.replace(keyFile.length()-1, 1, "cpp");
-    std::cout << keyFile << std::endl;
     m_configurations.objByName.emplace(
         keyFile,
         file

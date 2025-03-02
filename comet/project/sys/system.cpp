@@ -25,6 +25,7 @@ namespace system {
 
         char* command = const_cast<char*>( (name + ' ' + args).c_str() );
 
+        create:
         if(!CreateProcess( NULL,   // No module name (use command line)
             command,        // Command line
             NULL,           // Process handle not inheritable
@@ -36,7 +37,12 @@ namespace system {
             &si,            // Pointer to STARTUPINFO structure
             &processInfo)           // Pointer to PROCESS_INFORMATION structure
         ) {
-            throw SubprocessError(GetLastError());
+            int errorCode = GetLastError();
+            if(errorCode) {
+                std::cout << "Retrying..." << std::endl;
+                goto create;
+            }
+            throw SubprocessError(errorCode);
         }
 
         WaitForSingleObject(processInfo.hThread, INFINITE);

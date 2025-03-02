@@ -119,6 +119,8 @@ public:
      */
     bool constainsSource(const std::string &name);
     
+    std::map<std::string, std::string> getFilesTable();
+
     /**
      * @brief Adds direcotory that contains source files
      * 

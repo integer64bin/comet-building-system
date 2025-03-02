@@ -22,28 +22,12 @@ namespace console {
 
     /*============================Console command============================*/
 
-    void setup(fs::path where);
+    void init(fs::path where);
     
     
     // Build command
 
     void build();
-
-    /**
-     * This function parses build flags. 
-     * 
-     * Searches strings which starts with '-', after sets value of required
-     * flags
-     * 
-     * Flags:
-     * -debug-info
-     * -save-info
-     * -f
-     * -V
-     * -r
-     * -to
-     */
-    void parseBuildFlags();
 
 
                       /*----------Support functions---------*/
@@ -73,6 +57,11 @@ namespace console {
     
     void buildFromSource();
 
+    /**
+     * @brief This function prints inforamation of project 
+     * 
+     */
+    void info();
 
     /**
      * This function returns vector of indexes on that places

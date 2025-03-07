@@ -48,4 +48,17 @@ auto readFile(std::string_view path) -> std::string {
 }
 
 
+
+std::string getSeparatedNumber(std::size_t number, int sep) {
+    
+    std::string result;
+
+    while(number != 0) {
+        result.insert(0, " ");
+        result.insert(0, std::to_string(number % sep));
+        number /= sep;
+    }
+    return result;
+}
+
 }

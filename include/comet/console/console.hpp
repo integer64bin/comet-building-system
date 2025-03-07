@@ -13,7 +13,7 @@ class Project;
 namespace console {
 
     namespace fs = std::filesystem;
-    
+
     void parseArguments(int argc, const char **args);
 
     void parseCommand();

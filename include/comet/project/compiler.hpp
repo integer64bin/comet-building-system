@@ -21,6 +21,8 @@ struct CompilerOptions {
 
     const std::list<std::string> &dlls;
 
+    const std::string outputFile;
+
 };
 
 class Compiler {

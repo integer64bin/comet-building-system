@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <filesystem>
 
 #include <ast\value\Value.hpp>
 
@@ -11,6 +12,13 @@
 
 namespace comet {
 
+namespace fs = std::filesystem;
+
+
+/**
+ * @brief This struecture describes configuration of project
+ * 
+ */
 struct Configs {
     // Name of project
     std::string name = "noname";
@@ -66,9 +74,7 @@ struct Configs {
 
 class Project {
 
-
-    friend class Compiler;
-
+    // Variables
     std::map<std::string, Value *> m_variables;
 
     // std::map<std::string, Value *> m_constants;
@@ -96,6 +102,13 @@ public:
     void addSource(std::string file);
 
     /**
+     * @brief Adds all files with cpp extension from folder
+     * 
+     * @param folder the folder which from files loads
+     */
+    void addSourcesFrom(fs::path folder);
+
+    /**
      * @brief Get the list of source files
      * 
      * @return std::list<std::string> 
@@ -119,6 +132,12 @@ public:
      */
     bool constainsSource(const std::string &name);
     
+    /**
+     * @brief Returns table in which each file name corresponds to the 
+     * full file name (file name and root folder)
+     * 
+     * @return std::map<std::string, std::string> 
+     */
     std::map<std::string, std::string> getFilesTable();
 
     /**
@@ -323,6 +342,10 @@ public:
      */
     std::string getOutputPath();
 
+    void setOuptut(std::string out);
+
+    std::string getOutput();
+
                       /*--------------Compiler--------------*/
 
     /**
@@ -348,112 +371,6 @@ public:
     std::string getStandart();
 
 };
-
-class Projects {
-public:
-    
-    // Table of projects that created in session
-    static std::map<std::string, Project*> projects;
-
-    // The project that is being processed
-    static Project *target;
-
-    /**
-     * @brief Run a project with specified name and pass him specified
-     * arguments
-     * 
-     * @param name name of project 
-     * @param arguments conactenated with arguments with witespace separation
-     * @return int
-     */
-    static int run(const std::string &name, const std::string &arguments);
-
-    /**
-     * @brief
-     * Initializes projects' manager
-     * 
-     * This method calls other initialization methods of different 
-     * subsystems
-     * 
-     */
-    static void init();
-
-    /**
-     * @brief 
-     * Deletes all projects
-     * 
-     * This method calls other finalization methods of different 
-     * subsystems
-     * 
-     */
-    static void finalize();
-
-    /**
-     * @brief 
-     * 
-     * @param name 
-     * @param version 
-     */
-    static void initProject(std::string name, int version = 0);
-
-};
-
-
-// system funcions
-
-// Creates new project in heap and returns
-// reference to it;
-// When program exit deletes all projects
-Project &project(std::string name);
-
-// Sets Compiler from current project
-void setCompiler(std::string c, char standart = 98);
-
-                    /*-----Root, object & ouput paths-----*/
-
-void setRoot(std::string path);
-
-std::string getRoot();
-
-
-void setObjectPath(std::string);
-
-std::string getObjectPath();
-
-
-void setOutputPath(std::string);
-
-std::string getOutputPath();
-
-                    /*---------------Sources--------------*/
-
-void addSourcesPath(std::list< std::string > paths);
-
-void addSourcePath(std::string path);
-
-void addSource(std::list< std::string > files);
-
-void addSource(std::string);
-
-std::list<std::string> getSources();
-
-void addSourceDirectory(std::string dir);
-
-std::list<std::string> getSourceDirectories();
-
-                    /*---------------Include--------------*/
-
-void addInclude(std::string s);
-
-std::list<std::string> getIcludes();
-
-bool hasIncludes();
-
-
-void setVariable(std::string name, Value *val);
-
-Value* getVariable(std::string name);
-
 
 void callByName(std::string funcName, std::vector<Value *> arguments);
 

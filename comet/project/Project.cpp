@@ -6,6 +6,8 @@
 
 namespace comet {
 
+namespace fs = std::filesystem;
+
 Project::Project() { }
 
 
@@ -33,6 +35,18 @@ void Project::addSource(std::string file) {
 
 std::list<std::string> Project::getSources() {
     return m_configurations.sources;
+}
+
+void Project::addSourcesFrom(fs::path path) {
+    for(const auto &entry : fs::directory_iterator(path)) {
+        if(fs::is_directory(entry)) {
+            addSourceDirectory(entry.path().string());
+            addSourcesFrom(entry.path().string());
+            continue;
+        }
+        if(entry.path().extension() == ".cpp")
+            addSource( entry.path().string() );
+    }
 }
 
 void Project::addSourceDirectory(std::string dir) {

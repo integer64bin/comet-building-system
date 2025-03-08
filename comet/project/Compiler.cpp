@@ -71,12 +71,14 @@ void Compiler::link(CompilerOptions &opts, std::list<std::string> files, bool so
     }
     if(sources) {
         
+    } else {
+        
     }
 
 
-    if(!opts.dllSearchingPaths.empty()) {
+    // if(!opts.dllSearchingPaths.empty()) {
 
-    }
+    // }
 
 }
 

@@ -1,11 +1,15 @@
 #include <console\console.hpp>
 
 #include <project\project.hpp>
+#include <project\managament.hpp>
 #include <util.hpp>
 
 #include <iostream>   // for info print
 #include <chrono>     // for time information
 #include <filesystem> // for special file info
+
+#include <queue>
+#include <set>
 
 namespace comet {
 
@@ -22,14 +26,25 @@ namespace console {
     
     extern Project *current;
 
+
+    void printSources();
+
+    void printIncludes();
+
+    void printFilesTree(const fs::path &p, const std::string &tab = "");
+
+
     bool show_sources  = false;
     bool    full_names = false;
     
 
     bool shInclude     = false;
     bool    all_files  = false;
+    bool    as_tree    = false;
 
-    bool shRoot    = false; 
+    bool shRoot        = false; 
+
+    bool shObjects     = false;
 
     void info() {
         std::vector<std::size_t> indexes = getFlags();
@@ -43,6 +58,8 @@ namespace console {
                         full_names = true;
                     if(arguments[i].compare("--all-files") == 0)
                         all_files = true;
+                    if(arguments[i].compare("--as-tree") == 0)
+                        as_tree = true;
                 } else {
                     if(arguments[i].compare("sources") == 0) 
                         show_sources = true;
@@ -50,6 +67,8 @@ namespace console {
                         shInclude = true;
                     else if(arguments[i].compare("root") == 0)
                         shRoot = true;
+                    else if(arguments[i].compare("objects") == 0)
+                        shObjects = true;
                     // else {
                     //     name = arguments[i];
                     //     current = Projects::projects.at(name);
@@ -61,10 +80,11 @@ namespace console {
         current = Projects::target;
         
         if(show_sources) {
-            printSources(full_names);
+            printSources();
         }
 
-
+        if(shInclude)
+            printIncludes();
 
 
     }
@@ -72,23 +92,31 @@ namespace console {
     /*Info command support functions*/
 
     
-    void printSources(bool full_names) {
-        std::cout << "Sources:\n";
+    void printSources() {
+        std::cout << "Project " << current->getName() 
+                    << " contains these sources:\n";
         fs::directory_entry entry;
-        if(!full_names) {
+        if(as_tree) {
+            fs::path tmp;
+            for(const auto &dir : current->getSourceDirectories()) {
+                printFilesTree(tmp.assign(dir));
+            }
+        } else if(!full_names) {
             auto filesTable = current->getFilesTable();
             for(auto pair : filesTable) {
                 entry.assign(pair.second); // sets file
 
                 if(fs::exists(entry)) {
                     // Getting time of last edited
-                    auto lastEdited = chrono::clock_cast<chrono::system_clock>
-                                                    (entry.last_write_time());
+                    auto lastEdited = chrono::current_zone()->to_local(
+                        chrono::clock_cast<chrono::system_clock>
+                                    (entry.last_write_time())
+                        );
                     // File time
                     std::cout <<
                     std::format(
                         "{:%d.%m.%Y  %T}\t", 
-                            chrono::floor<chrono::seconds>(lastEdited + 3h)
+                            chrono::floor<chrono::seconds>(lastEdited)
                         );
 
                     std::cout.width(8);
@@ -105,13 +133,15 @@ namespace console {
                 if(fs::exists(file)) {
                     entry.assign(file);
                     // Getting time of last edited
-                    auto lastEdited = chrono::clock_cast<chrono::system_clock>
-                                                    (entry.last_write_time());
+                    auto lastEdited = chrono::current_zone()->to_local(
+                                        chrono::clock_cast<chrono::system_clock>
+                                                    (entry.last_write_time())
+                                        );
                     // File time
                     std::cout <<
                     std::format(
                         "{:%Y-%m-%d  %T}\t", 
-                            chrono::floor<chrono::seconds>(lastEdited + 3h)
+                            chrono::floor<chrono::seconds>(lastEdited)
                         );
                     std::cout.width(8);
                     std::cout << getSeparatedNumber(fs::file_size(file));
@@ -125,6 +155,78 @@ namespace console {
     }
 
 
+    void printIncludes() {
+        std::cout << "Project " << current->getName();
+        if(all_files) {
+            std::cout << " includes these files" << std::endl;
+        } else {
+            std::cout << " includes these directories" << std::endl;
+            std::cout << "Date        Time       Name" << std::endl;
+        }
+
+
+        if(as_tree) {
+            printFilesTree("include");
+        } else if(all_files) {
+            auto includeDirectories = current->getIncludeDirectories();
+            for(const auto &dir : includeDirectories) {
+                auto files = getFiles(dir);
+                std::cout << "Direcotry <" << dir << ">:\n";
+                std::cout << "Date        Time      Size       Name" << std::endl;
+                for(const auto &file : files) {
+                    auto lastEdited =  chrono::current_zone()->to_local(
+                                            chrono::clock_cast<chrono::system_clock>
+                                                    (fs::last_write_time(file))
+                                        );
+
+                    // File time
+                    std::cout <<
+                    std::format(
+                        "{:%d.%m.%Y  %T}\t", 
+                            chrono::floor<chrono::seconds>(lastEdited)
+                        );
+                    
+                    // File size
+                    std::cout.width(8);
+                    std::cout << getSeparatedNumber(fs::file_size(file));
+
+                    // File name
+                    std::cout << ' ' << file.filename().string() << std::endl;
+                }
+            }
+        } else {
+            auto includeDirectories = current->getIncludeDirectories();
+            for(const auto &dir : includeDirectories) {
+                fs::directory_entry file(dir);
+                auto lastEdited = chrono::clock_cast<chrono::system_clock>
+                                                    (fs::last_write_time(file));
+                // File time
+                std::cout <<
+                std::format(
+                    "{:%d.%m.%Y  %T}\t", 
+                        chrono::floor<chrono::seconds>(lastEdited + 3h)
+                    );
+                
+                std::cout << ' ' << dir << std::endl;
+            }
+        }
+    }
+
+
+
+    void printFilesTree(const fs::path &p, const std::string &tab) {
+        std::cout << tab << ">> " << p.stem().string() << std::endl;
+        for(const auto& entry : fs::directory_iterator(p)) {
+            if(fs::is_directory(entry)) {
+                printFilesTree(entry.path(), tab + " ");
+                continue;
+            }
+            std::cout << tab << "  o " << entry.path().filename().string() << std::endl;
+        }    
+        
+    }
 }
+
+
 
 }

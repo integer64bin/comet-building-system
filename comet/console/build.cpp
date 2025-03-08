@@ -18,8 +18,34 @@ namespace console {
     
     extern Project *current;
 
-
     namespace fs = std::filesystem;
+
+    /*==========================Methods declarations==========================*/
+
+    /**
+     * @brief Compiles only specified files, saves result to folder of
+     * object files. After compilation performs linking of obj files.
+     * If compilation errors occur doesn't perfrom linking
+     * 
+     * If names empty compiles all source files
+     * 
+     * @param names list of names of source files
+     */
+    void buildWithObjFiles(std::list<std::string> names = {});
+
+    /**
+     * @brief If directories for object files doesn't exist creates them. 
+     * Also fills a list of the object files of the current project  
+     * 
+     * @param objDirectory 
+     */
+    void initObjDirectories(std::string objDirectory);
+
+    /**
+     * @brief Builds program from source files without compilation
+     * 
+     */
+    void buildFromSource();
 
     /**
      * Variables below are spectial build flags
@@ -222,6 +248,8 @@ namespace console {
             current->addObjFile( objFile );
         }
     }
+    
+
     
     void buildFromSource() {
 

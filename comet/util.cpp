@@ -1,10 +1,11 @@
 #include <util.hpp>
 
 #include <fstream>
-
-#include <vector>
+#include <iostream>
 
 namespace comet {
+
+namespace fs = std::filesystem;
 
 std::string *makeStringArray(int argc, const char **argv) {
     if(!argc) {
@@ -40,7 +41,7 @@ auto readFile(std::string_view path) -> std::string {
     
     auto out = std::string();
     auto buf = std::string(read_size, '\0');
-    while (stream.read(& buf[0], read_size)) {
+    while (stream.read(&buf[0], read_size)) {
         out.append(buf, 0, stream.gcount());
     }
     out.append(buf, 0, stream.gcount());
@@ -55,10 +56,29 @@ std::string getSeparatedNumber(std::size_t number, int sep) {
 
     while(number != 0) {
         result.insert(0, " ");
-        result.insert(0, std::to_string(number % sep));
+        std::string num = std::to_string(number % sep);
+        if(num.size() < 3 && (number / sep) != 0) {
+            num.insert(0, std::string(3ULL-num.size(), '0'));
+        } 
+        result.insert(0, num);
         number /= sep;
     }
     return result;
 }
+
+
+
+std::list<fs::path> getFiles(std::string path) {
+    std::list<fs::path> files;
+    for(const auto &entry : fs::directory_iterator(path)) {
+        if(fs::is_directory(entry)) {
+            files.merge(getFiles(entry.path().string()));
+            continue;
+        }
+        files.push_back(entry.path());
+    }
+    return files;
+}
+
 
 }

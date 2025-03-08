@@ -8,18 +8,29 @@ namespace comet {
 
 enum TokenType {
 
+    // builtin types
     WORD, 
     NUMBER,
     TEXT,
+    TRUE,
+    FALSE,
+
+    // keywords
+    IF,
+    ELSE,
 
     // Punct
     LPAREN = '(',
     RPAREN = ')',
 
+    LBRACE = '{',
+    RBRACE = '}',
+
     COMMA = ',',
     COLON = ':',
 
     DOLLAR = '$',
+    QM = '?',
 
     EQ = '=',
 

@@ -20,7 +20,7 @@ namespace console {
 
     void readScript();
 
-    /*============================Console command============================*/
+    /*============================Console commands============================*/
 
     void init(fs::path where);
     
@@ -28,34 +28,6 @@ namespace console {
     // Build command
 
     void build();
-
-
-                      /*----------Support functions---------*/
-
-    /**
-     * @brief Compiles all files that project has, saves result to folder of
-     * object files. After compilation performs linking of obj files.
-     * If compilation errors occur doesn't perfrom linking
-     */
-    // void buildWithObjFiles();
-
-    /**
-     * @brief Compiles only specified files, saves result to folder of
-     * object files. After compilation performs linking of obj files.
-     * If compilation errors occur doesn't perfrom linking
-     * 
-     * If names empty compiles all source files
-     * 
-     * @param names list of names of source files
-     */
-    void buildWithObjFiles(std::list<std::string> names = {});
-    
-    // Compiles immediatly
-    
-    // 
-    void initObjDirectories(std::string objDirectory);
-    
-    void buildFromSource();
 
     /**
      * @brief This function prints inforamation of project 

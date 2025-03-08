@@ -47,8 +47,6 @@ namespace console {
      * @return std::string 
      */
 
-    void printSources(bool full_names);
-
     std::string getWorkingDirectory(std::string &line) {
         auto i = line.size() - 1;
         for(; i >= 0; i--) {

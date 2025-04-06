@@ -38,7 +38,7 @@ namespace system {
             &processInfo)           // Pointer to PROCESS_INFORMATION structure
         ) {
             int errorCode = GetLastError();
-            if(errorCode) {
+            if(errorCode == 0) {
                 std::cout << "Retrying..." << std::endl;
                 goto create;
             }

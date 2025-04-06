@@ -58,15 +58,13 @@ struct Configs {
     // Path to executable/library 
     std::string resultPath = "";
 
+    std::string output = "";
+
     // directories which contains libraries
     std::list<std::string> libFolders;
 
     // libraries which need to link
     std::list<std::string> libraries;
-
-    // libraries which need to link
-    // List of files' names with full path
-    std::list<std::string> sls;
 
 };
 
@@ -342,7 +340,7 @@ public:
      */
     std::string getOutputPath();
 
-    void setOuptut(std::string out);
+    void setOutput(std::string out);
 
     std::string getOutput();
 

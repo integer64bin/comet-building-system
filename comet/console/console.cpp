@@ -2,10 +2,6 @@
 
 #include <iostream> // condole output
 #include <fstream>  // file reading/writing
-#include <chrono>
-
-#include <format>
-#include <locale>
 
 #include <util.hpp>
 #include <project\project.hpp>
@@ -28,47 +24,27 @@ namespace console {
 
     // Place from which called comet.exe
     //
-    std::string workspace;
-
-    //  
-    std::string root = ".";
+    std::string workspace = ".";
 
     // List of arguments
-    std::vector<std::string> arguments;
+    std::list<std::string> arguments;
 
     // Current project
     Project *current;
 
 
-    /**
-     * @brief Get the Working Directory object
-     * 
-     * @param line 
-     * @return std::string 
-     */
-
-    std::string getWorkingDirectory(std::string &line) {
-        auto i = line.size() - 1;
-        for(; i >= 0; i--) {
-            if(line[i] == '\\')
-                break;
-        }
-        return line.substr(0, i);
-    }
+    
     
     void parseArguments(int argc, const char **argv) {
-
         if(argc == 1) {
             return;
         }
 
-        arguments = makeStringVector(argc, argv);
+        arguments = makeStringList(argc, argv);
+        arguments.pop_front(); // deletes comet.exe
 
-        // after last '\' comes exe-file name
-        // befor last '\' comes working directory
-        workspace = getWorkingDirectory(arguments[0]);
-
-        try { 
+        try {
+            // Command pipeline
             parseCommand();
         } catch(ConsoleError &e) {
             std::cerr << "An error occured during command execution..." << std::endl;
@@ -77,23 +53,39 @@ namespace console {
         }
     }
 
+    bool terminal_mode = false;
+
+    void parseCommand(std::string command) {
+        std::size_t lastSpace = 0;
+        std::size_t space = command.find(' ');
+        arguments.clear();
+        for(;;) {
+            arguments.push_back(command.substr(lastSpace, space-lastSpace));
+            lastSpace = space + 1;
+            while(command.at(lastSpace) == ' ') lastSpace++;
+            space = command.find(' ', lastSpace);
+            if(space == command.npos || space >= command.size()) {
+                arguments.push_back(command.substr(lastSpace));
+                break;
+            }
+        }
+        parseCommand();
+    }
+
     void parseCommand() {
         // Count of arguments without command and work directory
-        int argc = arguments.size() - 2;
+        int argc = 1;
 
-        std::string command = arguments[1];
+        std::string command = arguments.front();
+        arguments.pop_front();  // deletes command
 
         if(command.compare("init") == 0) {
-            fs::path dir;
-            if(argc == 0 || (argc == 1 && arguments[2].compare("."))) {
-                dir = fs::path(workspace);
-            } else {
-                dir = fs::path(workspace + "\\" + arguments[2]);
-            }
-
-            init(dir);
-
-         
+            // fs::path dir;
+            // init(dir);
+        
+        } else if(command.compare("terminal") == 0) {
+            terminal_mode = true;
+            terminal();
         } else if(command.compare("help") == 0) {
             
         } else { // commands that require script
@@ -122,16 +114,20 @@ namespace console {
         }
     }
 
+    /**
+     * @brief Get the Working Directory object
+     * 
+     * @param line 
+     * @return std::string 
+     */
 
-    std::vector<std::size_t> getFlags() {
-        std::vector<std::size_t> indexes;
-        
-        for(std::size_t i = 0; i < arguments.size(); i++) {
-            if(arguments[i][0] == '-') 
-                indexes.push_back(i);
+    std::string getWorkingDirectory(std::string &line) {
+        auto i = line.size() - 1;
+        for(; i >= 0; i--) {
+            if(line[i] == '\\')
+                break;
         }
-
-        return indexes;
+        return line.substr(0, i);
     }
 
 }

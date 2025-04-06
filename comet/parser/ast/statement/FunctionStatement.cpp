@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <project\project.hpp>
+#include <project\managament.hpp>
 
 namespace comet {
 
@@ -24,7 +25,7 @@ FunctionStatement::~FunctionStatement() {
 
 void FunctionStatement::execute() {
     std::vector<Value*> args = evalArguments();
-    callByName(m_funcName, args);
+    Projects::call(m_funcName, args);
 }
 
 

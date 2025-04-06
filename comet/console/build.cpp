@@ -3,6 +3,7 @@
 #include <console\console.hpp>
 
 #include <project\project.hpp>
+#include <project\managament.hpp>
 #include <project\compiler.hpp>
 
 #include <iostream>
@@ -14,7 +15,7 @@ namespace comet {
 namespace console {
 
     // Global console variables
-    extern std::vector<std::string> arguments;
+    extern std::list<std::string> arguments;
     
     extern Project *current;
 
@@ -57,8 +58,10 @@ namespace console {
     bool run_after;
     
     void build() {
-        // First step falgs parsing
-        std::vector<std::size_t> indexes = getFlags();
+        std::string name = arguments.front().starts_with('-') ? 
+                            "" :
+                            arguments.front();
+
 
         // build flags parsing
 
@@ -68,13 +71,13 @@ namespace console {
         // Arguments specified by "r" falg
         std::string startArgs;
 
-        for(std::size_t i : indexes) {
-            if(arguments[i].starts_with("-f")) {
+        for(auto argument : arguments) {
+            if(argument.starts_with("-f")) {
                 selective_compilation = true;
                 // Two cases:
                 // 1) One file: -ffile
                 // 2) N files: -ffile0,fil1,...,filen
-                std::string names = arguments[i].substr(2);
+                std::string names = argument.substr(2);
                 // case 1
                 if(names.find(',') == names.npos){
                     selectedFiles.push_back(names);
@@ -101,12 +104,12 @@ namespace console {
                             break;
                     }
                 }
-            } else if(arguments[i].compare("--debug-info") == 0) { 
+            } else if(argument.compare("--debug-info") == 0) { 
                 Compiler::debug_info = true;
-            } else if(arguments[i].compare("--ignore-errors") == 0) {
+            } else if(argument.compare("--ignore-errors") == 0) {
                 Compiler::ignore_errors = true;
-            } else if(arguments[i].starts_with("-r")) {
-                std::string startArgsList = arguments[i].substr(3);
+            } else if(argument.starts_with("-r")) {
+                std::string startArgsList = argument.substr(3);
                 // Two cases
                 // 1) One argument: -r--arg0
                 // 2) N arguments: -r-o,-f,-s,--aeg0...
@@ -139,9 +142,6 @@ namespace console {
                 }
             }
         }
-        
-        std::string name = arguments[2].starts_with("-") ? 
-                                    "" : arguments[2];
 
         // Building 
         if(name.empty()) {

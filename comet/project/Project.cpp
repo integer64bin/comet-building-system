@@ -220,5 +220,13 @@ std::string Project::getOutputPath() {
     return m_configurations.resultPath;
 }
 
+void Project::setOutput(std::string out) {
+    m_configurations.output = out.append(".exe");
+}
+
+std::string Project::getOutput() {
+    return m_configurations.output;
+}
+
 
 }

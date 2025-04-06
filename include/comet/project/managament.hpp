@@ -2,6 +2,10 @@
 
 #include <string>
 #include <map>
+#include <vector>
+
+#include <ast\value\Value.hpp>
+#include <functional>
 
 
 namespace comet {
@@ -9,52 +13,68 @@ namespace comet {
 class Project;
 
 class Projects {
-    public:
-        
-        // Table of projects that created in session
-        static std::map<std::string, Project*> projects;
+
+    /**
+     * @brief This variable stores all functions, that can be used by in script
+     * 
+     */
+    static std::map<std::string, std::function<void(std::vector<Value*>)> > functions;
+
+public:
     
-        // The project that is being processed
-        static Project *target;
-    
-        /**
-         * @brief Run a project with specified name and pass him specified
-         * arguments
-         * 
-         * @param name name of project 
-         * @param arguments conactenated with arguments with witespace separation
-         * @return int
-         */
-        static int run(const std::string &name, const std::string &arguments);
-    
-        /**
-         * @brief
-         * Initializes projects' manager
-         * 
-         * This method calls other initialization methods of different 
-         * subsystems
-         * 
-         */
-        static void init();
-    
-        /**
-         * @brief 
-         * Deletes all projects
-         * 
-         * This method calls other finalization methods of different 
-         * subsystems
-         * 
-         */
-        static void finalize();
-    
-        /**
-         * @brief 
-         * 
-         * @param name 
-         * @param version 
-         */
-        static void initProject(std::string name, int version = 0);
-    
-    };
+    // Table of projects that created in session
+    static std::map<std::string, Project*> projects;
+
+    // The project that is being processed
+    static Project *target;
+
+    /**
+     * @brief Calls the script function with specified name
+     * 
+     * @param name name of function
+     * @param arguments array of arguments
+     * @throw UnknownFunction if function isn't defined 
+     */
+    static void call(const std::string &name, const std::vector<Value*> &arguments);
+
+    /**
+     * @brief Run a project with specified name and pass him specified
+     * arguments
+     * 
+     * @param name name of project 
+     * @param arguments conactenated with arguments with witespace separation
+     * @return int
+     */
+    static int run(const std::string &name, const std::string &arguments);
+
+    /**
+     * @brief
+     * Initializes projects' manager
+     * 
+     * This method calls other initialization methods of different 
+     * subsystems
+     * 
+     */
+    static void init();
+
+    /**
+     * @brief 
+     * Deletes all projects
+     * 
+     * This method calls other finalization methods of different 
+     * subsystems
+     * 
+     */
+    static void finalize();
+
+    /**
+     * @brief 
+     * 
+     * @param name 
+     * @param version 
+     */
+    static void initProject(std::string name, int version = 0);
+
+};
 
 }

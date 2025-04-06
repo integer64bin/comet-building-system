@@ -1,4 +1,5 @@
 #include <exception\execution\UnknownVariable.hpp>
+#include <exception\execution\UnknownFunction.hpp>
 
 namespace comet {
 
@@ -17,5 +18,11 @@ const char *ExecutionError::what() const noexcept {
 UnknownVariable::UnknownVariable(const std::string &name) {
     m_message.append("Unknown variable \"").append(name).push_back('"');
 }
+
+
+UnknownFunction::UnknownFunction(const std::string &name) {
+    m_message.append("Unknown function \"").append(name).push_back('"');
+}
+
 
 }

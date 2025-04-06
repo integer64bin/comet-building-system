@@ -22,7 +22,7 @@ namespace console {
     using namespace std::chrono_literals;
 
     // Global console variables
-    extern std::vector<std::string> arguments;
+    extern std::list<std::string> arguments;
     
     extern Project *current;
 
@@ -52,22 +52,22 @@ namespace console {
         std::string name;
 
         if(arguments.size() > 2) {
-            for(int i = 2; i < arguments.size(); i++) {
-                if(arguments[i].starts_with('-')) {
-                    if(arguments[i].compare("--full-names") == 0)
+            for(auto arg : arguments) {
+                if(arg.starts_with('-')) {
+                    if(arg.compare("--full-names") == 0)
                         full_names = true;
-                    if(arguments[i].compare("--all-files") == 0)
+                    if(arg.compare("--all-files") == 0)
                         all_files = true;
-                    if(arguments[i].compare("--as-tree") == 0)
+                    if(arg.compare("--as-tree") == 0)
                         as_tree = true;
                 } else {
-                    if(arguments[i].compare("sources") == 0) 
+                    if(arg.compare("sources") == 0) 
                         show_sources = true;
-                    else if(arguments[i].compare("includes") == 0)
+                    else if(arg.compare("includes") == 0)
                         shInclude = true;
-                    else if(arguments[i].compare("root") == 0)
+                    else if(arg.compare("root") == 0)
                         shRoot = true;
-                    else if(arguments[i].compare("objects") == 0)
+                    else if(arg.compare("objects") == 0)
                         shObjects = true;
                     // else {
                     //     name = arguments[i];

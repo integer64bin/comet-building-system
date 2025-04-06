@@ -3,6 +3,7 @@
 #include <ast\expression\AccessExpression.hpp>
 
 #include <project\project.hpp>
+#include <project\managament.hpp>
 
 #include <exception\execution\UnknownVariable.hpp>
 

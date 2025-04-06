@@ -15,18 +15,27 @@ namespace console {
     namespace fs = std::filesystem;
 
     void parseArguments(int argc, const char **args);
-
+    
+    void parseCommand(std::string command);
+    
     void parseCommand();
 
     void readScript();
 
     /*============================Console commands============================*/
 
+    /**
+     * @brief Creates ".xconfig" file in sepcified folder
+     * 
+     * @param where 
+     */
     void init(fs::path where);
     
     
-    // Build command
-
+    /**
+     * @brief Performs compilation and linking. If object path isn't specified
+     * peroforms only linking from source files.
+     */
     void build();
 
     /**
@@ -34,6 +43,12 @@ namespace console {
      * 
      */
     void info();
+
+    /**
+     * @brief Activates terminal mode
+     * 
+     */
+    void terminal();
 
     /**
      * This function returns vector of indexes on that places
@@ -48,6 +63,8 @@ namespace console {
 
     // returns list of directories
     std::string getDirectory(std::string dir);
+
+    const std::string &getCommand();
 
 }
 

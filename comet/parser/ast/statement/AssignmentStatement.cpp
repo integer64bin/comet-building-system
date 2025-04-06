@@ -1,6 +1,7 @@
 #include <ast\statement\AssignmentStatement.hpp>
 
 #include <project\project.hpp>
+#include <project\managament.hpp>
 
 #include <iostream>
 
@@ -17,7 +18,7 @@ AssignmentStatement::~AssignmentStatement() {
 
 void AssignmentStatement::execute() {
     try {
-        setVariable(m_varName, m_value->eval());
+        Projects::target->setVariable(m_varName, m_value->eval());
     } catch(...) {
         throw;
     }

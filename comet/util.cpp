@@ -30,6 +30,15 @@ std::vector<std::string> makeStringVector(int argc, const char **argv) {
     return strings;
 }
 
+std::list<std::string> makeStringList(int argc, const char **argv) {
+    std::list<std::string> result;
+    for(int i = 0; i < argc; i++) {
+        result.push_back(argv[i]);
+    }
+    return result;
+}
+
+
 auto readFile(std::string_view path) -> std::string {
     constexpr auto read_size = std::size_t(4096);
     auto stream = std::ifstream(path.data());

@@ -23,10 +23,17 @@ namespace console {
         std::string buffer;
         
         while(true) {
-            std::cout << ">>> ";
+            std::cout << "comet > ";
             std::getline(std::cin, buffer);
+            if(buffer.empty())
+                continue;
+            // terminal commands
             if(buffer.compare("quit") == 0 || buffer.compare("exit") == 0)
                 break;
+            // else if(buffer.compare("cls")) {
+            //     system("cls");
+            //     continue;
+            // }
             parseCommand(buffer);
         }
     }

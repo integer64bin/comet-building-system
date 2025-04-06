@@ -22,7 +22,7 @@ UnknownCommand::UnknownCommand(const std::string &command) {
  * UnknownProject error
  */
 UnknownProject::UnknownProject(const std::string &name) {
-    m_message = "Unknown project 'use projects --list' to view list of projects";
+    m_message = "Unknown project use 'projects list' to view list of projects";
 }
 
 /**

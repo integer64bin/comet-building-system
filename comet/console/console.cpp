@@ -93,7 +93,7 @@ namespace console {
             if(command.compare("build") == 0) {
                 build();
             } else if(command.compare("link") == 0) {
-
+                
             } else if(command.compare("info") == 0) {
                 info();
             }

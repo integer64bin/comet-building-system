@@ -23,11 +23,17 @@ namespace system {
         si.cb = sizeof(si);
         ZeroMemory( &processInfo, sizeof(processInfo) );
 
-        char* command = const_cast<char*>( (name + ' ' + args).c_str() );
+        std::string command = (name + ' ' + args);
 
-        create:
-        if(!CreateProcess( NULL,   // No module name (use command line)
-            command,        // Command line
+        char* cstrCommand = new char[command.size() + 1];
+
+        command.copy(cstrCommand, command.size());
+        cstrCommand[command.size()] = 0;
+
+        // create:
+        if(!CreateProcess(
+            NULL,           // No module name (use command line)
+            cstrCommand,    // Command line
             NULL,           // Process handle not inheritable
             NULL,           // Thread handle not inheritable
             FALSE,          // Set handle inheritance to FALSE
@@ -35,13 +41,15 @@ namespace system {
             NULL,           // Use parent's environment block
             NULL,           // Use parent's starting directory 
             &si,            // Pointer to STARTUPINFO structure
-            &processInfo)           // Pointer to PROCESS_INFORMATION structure
+            &processInfo)   // Pointer to PROCESS_INFORMATION structure
         ) {
             int errorCode = GetLastError();
+            std::cout << errorCode << std::endl;
             if(errorCode == 0) {
                 std::cout << "Retrying..." << std::endl;
-                goto create;
+                // goto create;
             }
+            delete[] cstrCommand;
             throw SubprocessError(errorCode);
         }
 
@@ -49,6 +57,8 @@ namespace system {
         CloseHandle(processInfo.hProcess);
         CloseHandle(processInfo.hThread);
         
+        delete[] cstrCommand;
+
         return true;
     }
 

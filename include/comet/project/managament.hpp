@@ -68,12 +68,36 @@ public:
     static void finalize();
 
     /**
-     * @brief 
+     * @brief Creates projects with specifies name and version
      * 
      * @param name 
      * @param version 
      */
     static void initProject(std::string name, int version = 0);
+
+    /**
+     * @brief 
+     * 
+     * @return count of projects
+     */
+    static int count();
+
+    /**
+     * @brief Returns 
+     * 
+     * @param name 
+     * @return true  if exists project with specified name
+     * @return false 
+     */
+    static bool contains(const std::string &name);
+
+    /**
+     * @brief Returns project by name
+     * 
+     * @param name 
+     * @return Project* 
+     */
+    static Project *get(const std::string &name);
 
 };
 

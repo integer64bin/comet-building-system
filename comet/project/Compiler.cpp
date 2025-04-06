@@ -69,10 +69,20 @@ void Compiler::link(CompilerOptions &opts, std::list<std::string> files, bool so
         "occured during compiltion" << std::endl;
         std::exit(1);
     }
+
     if(sources) {
         
     } else {
-        
+
+        std::string command = "-o ";
+        command.append(opts.outputFile);
+
+        for(const auto file : files) {
+            command.push_back(' ');
+            command.append(file);
+        }
+
+        system::createProcess("g++", command);
     }
 
 

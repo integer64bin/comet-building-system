@@ -4,6 +4,8 @@
 #include <project\managament.hpp>
 #include <util.hpp>
 
+#include <exception\console\CommandError.hpp>
+
 #include <iostream>   // for info print
 #include <chrono>     // for time information
 #include <filesystem> // for special file info
@@ -47,11 +49,21 @@ namespace console {
     bool shObjects     = false;
 
     void info() {
-        std::vector<std::size_t> indexes = getFlags();
-
         std::string name;
 
-        if(arguments.size() > 2) {
+        if(Projects::count() > 1) {
+            name = arguments.front();
+            
+            if(!Projects::contains(name))
+                throw UnknownProject(name); // project wasn't found
+            
+            arguments.pop_front();
+            current = Projects::get(name);
+        } else {
+            current = Projects::target;
+        }
+
+        if(arguments.size() > 0) {
             for(auto arg : arguments) {
                 if(arg.starts_with('-')) {
                     if(arg.compare("--full-names") == 0)
@@ -77,7 +89,7 @@ namespace console {
             }
         }
 
-        current = Projects::target;
+        
         
         if(show_sources) {
             printSources();
@@ -215,13 +227,13 @@ namespace console {
 
 
     void printFilesTree(const fs::path &p, const std::string &tab) {
-        std::cout << tab << ">> " << p.stem().string() << std::endl;
+        std::cout << tab << "v " << p.stem().string() << std::endl;
         for(const auto& entry : fs::directory_iterator(p)) {
             if(fs::is_directory(entry)) {
                 printFilesTree(entry.path(), tab + " ");
                 continue;
             }
-            std::cout << tab << "  o " << entry.path().filename().string() << std::endl;
+            std::cout << tab << "  > " << entry.path().filename().string() << std::endl;
         }    
         
     }

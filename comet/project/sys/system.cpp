@@ -93,6 +93,16 @@ namespace system {
         return "Unknow error";
     }
 
+    namespace ui {
+
+        void setFontColor(color foreground, color background) {
+            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            SetConsoleTextAttribute(hConsole, (background << 4) | foreground);
+        }
+
+    }
+
 }
 
 

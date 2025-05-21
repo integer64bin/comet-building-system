@@ -51,6 +51,12 @@ namespace console {
     void terminal();
 
     /**
+     * @brief Links object or source files
+     * 
+     */
+    void link();
+
+    /**
      * This function returns vector of indexes on that places
      * flags (words that starts with '-')
      * 

@@ -16,6 +16,8 @@ namespace comet {
 
         constinit const std::string_view F_ADD_INCLUDES        = "addIncludes";
 
+        constinit const std::string_view F_ADD_LIBRARIES       = "addLibraries";
+
         constinit const std::string_view F_SET_OUT_PATH        = "setOutPath";
 
         constinit const std::string_view F_SET_EXECUTABLE      = "setExecutable";

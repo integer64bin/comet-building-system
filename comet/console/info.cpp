@@ -4,6 +4,8 @@
 #include <project\managament.hpp>
 #include <util.hpp>
 
+#include <project\sys\system.hpp>
+
 #include <exception\console\CommandError.hpp>
 
 #include <iostream>   // for info print
@@ -173,7 +175,8 @@ namespace console {
             std::cout << " includes these files" << std::endl;
         } else {
             std::cout << " includes these directories" << std::endl;
-            std::cout << "Date        Time       Name" << std::endl;
+            if(!as_tree)
+                std::cout << "Date        Time       Name" << std::endl;
         }
 
 
@@ -227,12 +230,14 @@ namespace console {
 
 
     void printFilesTree(const fs::path &p, const std::string &tab) {
+        system::ui::setFontColor(system::ui::color::grey);
         std::cout << tab << "v " << p.stem().string() << std::endl;
         for(const auto& entry : fs::directory_iterator(p)) {
             if(fs::is_directory(entry)) {
                 printFilesTree(entry.path(), tab + " ");
                 continue;
             }
+            system::ui::setFontColor(system::ui::color::white);
             std::cout << tab << "  > " << entry.path().filename().string() << std::endl;
         }    
         

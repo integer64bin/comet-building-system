@@ -93,7 +93,7 @@ namespace console {
             if(command.compare("build") == 0) {
                 build();
             } else if(command.compare("link") == 0) {
-                
+                link();
             } else if(command.compare("info") == 0) {
                 info();
             }
@@ -103,12 +103,17 @@ namespace console {
 
 
     void readScript() {
-        Script script(workspace + "\\.xconfig");
-
-        script.perform();
         try {
-            script.execute();
-        } catch(ExecutionError &e) {
+            Script script(workspace + "\\.xconfig");
+
+            script.perform();
+            try {
+                script.execute();
+            } catch(ExecutionError &e) {
+                std::cerr << e.what() << std::endl;
+                std::exit(1);
+            }
+        } catch (std::ios_base::failure e) {
             std::cerr << e.what() << std::endl;
             std::exit(1);
         }

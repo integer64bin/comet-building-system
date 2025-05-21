@@ -18,7 +18,7 @@ class Projects {
      * @brief This variable stores all functions, that can be used by in script
      * 
      */
-    static std::map<std::string, std::function<void(std::vector<Value*>)> > functions;
+    static std::map<std::string, std::function<void(Project*, std::vector<Value*>)> > functions;
 
 public:
     

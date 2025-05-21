@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 
 /*===============================Main varibales==============================*/
 
-std::map<std::string, std::function<void(std::vector<Value*>)> > Projects::functions;
+std::map<std::string, std::function<void(Project*, std::vector<Value*>)> > Projects::functions;
 
 std::map<std::string, Project*> Projects::projects;
 
@@ -30,7 +30,7 @@ Project *Projects::target;
 
 void Projects::call(const std::string &name, const std::vector<Value*> &arguments) {
     try {
-        functions.at(name)(arguments);
+        functions.at(name)(target, arguments);
     } catch(std::out_of_range) {
         throw UnknownFunction(name);
     }
@@ -72,7 +72,7 @@ void Projects::init() {
     // Fucntions initialization
     functions.emplace(
         functions::F_PROJECT,
-        [&](std::vector<Value *> arguments) mutable -> void  {
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void  {
             Project *newProj = new Project(arguments[0]->asString());
 
             // Add to projects' table
@@ -85,52 +85,61 @@ void Projects::init() {
 
     functions.emplace(
         functions::F_SET_ROOT,
-        [&](std::vector<Value *> arguments) mutable -> void {
-            Projects::target->setRoot(arguments[0]->asString());
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            target->setRoot(arguments[0]->asString());
         }
     );
 
     functions.emplace(
         functions::F_SET_COMPILER,
-        [&](std::vector<Value *> arguments) mutable -> void {
-            Projects::target->setCompiler(arguments[0]->asString(),
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            target->setCompiler(arguments[0]->asString(),
                     (char)arguments[1]->asNumber());
         }
     );
 
     functions.emplace(
         functions::F_ADD_INCLUDES,
-        [&](std::vector<Value *> arguments) mutable -> void {
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
             for(auto i : arguments)
-                Projects::target->addIncludeDirectory(i->asString());
+                target->addIncludeDirectory(i->asString());
         }
     );
 
     functions.emplace(
         functions::F_ADD_SOURCES_PATH,
-        [&](std::vector<Value *> arguments) mutable -> void {
-            Projects::target->addSourcesFrom(arguments[0]->asString());
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            target->addSourcesFrom(arguments[0]->asString());
         }
     );
 
     functions.emplace(
         functions::F_SET_OUT_PATH,
-        [&](std::vector<Value *> arguments) mutable -> void {
-            Projects::target->setObjectPath(arguments[0]->asString());
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            target->setObjectPath(arguments[0]->asString());
         }
     );
 
     functions.emplace(
         functions::F_SET_EXECUTABLE_PATH,
-        [&](std::vector<Value *> arguments) mutable -> void {
-            Projects::target->setOutputPath(arguments[0]->asString());
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            target->setOutputPath(arguments[0]->asString());
         }
     );
 
     functions.emplace(
         functions::F_SET_EXECUTABLE,
-        [&](std::vector<Value *> arguments) mutable -> void {
-            Projects::target->setOutput(arguments[0]->asString());
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            target->setOutput(arguments[0]->asString());
+        }
+    );
+
+    functions.emplace(
+        functions::F_ADD_LIBRARIES,
+        [&](Project *target, std::vector<Value *> arguments) mutable -> void {
+            for(auto lib : arguments) {
+                target->addLibrary(lib->asString());
+            }
         }
     );
 
